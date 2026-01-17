@@ -221,7 +221,7 @@ export const ASSET_TYPES = {
     fuelConsumption: 60,
     speed: 15,
     detectionRange: 60,
-    iceCapability: 0.5, 
+    iceCapability: 0.9, 
     payload: 300,
     cost: 150,
   },
