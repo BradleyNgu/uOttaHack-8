@@ -50,13 +50,11 @@ function App() {
         <div className="logo">
           <span className="icon">🛡️</span>
           <div className="title">
-            <h1>ARCTIC SENTINEL</h1>
-            <span className="subtitle">Canadian Arctic Operations Simulator</span>
+            <h1>ARCTIC ARGUS</h1>
+            <span className="subtitle">Canadian Arctic Patrol Simulator</span>
           </div>
         </div>
         <div className="header-info">
-          <span className="version">v1.0</span>
-          <span className="badge">CLASSIFIED</span>
         </div>
       </motion.header>
 
