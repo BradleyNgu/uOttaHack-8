@@ -88,9 +88,6 @@ export default function ControlPanel() {
       <div className="time-display">
         <div className="day">DAY {currentDay}</div>
         <div className="time">{formatTime(currentTime)}</div>
-        <div className="weather">
-          {WEATHER_CONDITIONS[globalWeather]?.icon} {WEATHER_CONDITIONS[globalWeather]?.name}
-        </div>
       </div>
 
       <div className="budget-display">
@@ -184,8 +181,8 @@ export default function ControlPanel() {
                 </label>
                 <input
                   type="range"
-                  min="100"
-                  max="1000"
+                  min="500"
+                  max="2000"
                   step="50"
                   value={settings.budget}
                   onChange={(e) => updateSettings({ budget: parseInt(e.target.value) })}
