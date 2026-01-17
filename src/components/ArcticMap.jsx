@@ -582,12 +582,12 @@ export default function ArcticMap() {
         <g className="map-legend-svg">
           <rect x="10" y="440" width="120" height="100" fill="rgba(0, 0, 0, 0.7)" rx="5" />
           <text x="20" y="460" fill="#fff" fontSize="14" fontWeight="bold">LEGEND</text>
-          <circle cx="20" cy="475" r="4" fill={NODE_COLORS.port} />
-          <text x="30" y="480" fill="#fff" fontSize="11">Ports</text>
-          <circle cx="20" cy="495" r="4" fill={NODE_COLORS.resource} />
-          <text x="30" y="500" fill="#fff" fontSize="11">Resources</text>
-          <circle cx="20" cy="515" r="4" fill={NODE_COLORS.patrol} />
-          <text x="30" y="520" fill="#fff" fontSize="11">Patrol Points</text>
+          <circle cx="25" cy="477" r="4" fill={NODE_COLORS.port} />
+          <text x="35" y="480" fill="#fff" fontSize="11">Ports</text>
+          <circle cx="25" cy="497" r="4" fill={NODE_COLORS.resource} />
+          <text x="35" y="500" fill="#fff" fontSize="11">Resources</text>
+          <circle cx="25" cy="517" r="4" fill={NODE_COLORS.patrol} />
+          <text x="35" y="520" fill="#fff" fontSize="11">Patrol Points</text>
         </g>
       </svg>
 
