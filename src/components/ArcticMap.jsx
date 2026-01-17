@@ -16,7 +16,7 @@ const NODE_SIZES = {
 };
 
 export default function ArcticMap() {
-  const canvasRef = useRef(null);
+  const svgRef = useRef(null);
   const [hoveredNode, setHoveredNode] = useState(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   
@@ -32,53 +32,51 @@ export default function ArcticMap() {
     isRunning,
   } = useGameStore();
 
-  const handleCanvasClick = (e) => {
-    const rect = e.target.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+  // Convert screen coordinates to SVG viewBox coordinates
+  const screenToSVG = (e) => {
+    const svg = svgRef.current;
+    if (!svg) return { x: 0, y: 0 };
+    
+    const rect = svg.getBoundingClientRect();
+    const scaleX = 800 / rect.width;  // viewBox width / actual width
+    const scaleY = 550 / rect.height; // viewBox height / actual height
+    
+    const x = (e.clientX - rect.left) * scaleX;
+    const y = (e.clientY - rect.top) * scaleY;
+    
+    return { x, y };
+  };
 
-    // Check if clicked on a node
-    for (const [nodeId, node] of Object.entries(NODES)) {
-      const dist = Math.sqrt((x - node.x) ** 2 + (y - node.y) ** 2);
-      if (dist < NODE_SIZES[node.type] + 5) {
-        if (selectedAssetId) {
-          moveAsset(selectedAssetId, nodeId);
-        } else {
-          selectNode(nodeId);
-        }
-        return;
-      }
+  const handleNodeClick = (e, nodeId) => {
+    e.stopPropagation();
+    if (selectedAssetId) {
+      moveAsset(selectedAssetId, nodeId);
+    } else {
+      selectNode(nodeId);
     }
+  };
 
-    // Check if clicked on an asset
-    for (const asset of assets) {
-      const node = NODES[asset.position];
-      if (!node) continue;
-      
-      const assetX = node.x + 20;
-      const assetY = node.y;
-      const dist = Math.sqrt((x - assetX) ** 2 + (y - assetY) ** 2);
-      
-      if (dist < 15) {
-        selectAsset(asset.id);
-        return;
-      }
+  const handleAssetClick = (e, assetId) => {
+    e.stopPropagation();
+    selectAsset(assetId);
+  };
+
+  const handleBackgroundClick = (e) => {
+    // Only deselect if clicking on background, not on nodes/assets
+    if (e.target.tagName === 'rect' || e.target.tagName === 'svg') {
+      selectNode(null);
+      selectAsset(null);
     }
-
-    selectNode(null);
-    selectAsset(null);
   };
 
   const handleMouseMove = (e) => {
-    const rect = e.target.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    setMousePos({ x, y });
+    const { x, y } = screenToSVG(e);
+    setMousePos({ x: e.clientX, y: e.clientY }); // Keep screen coords for tooltip
 
     // Check for hovered node
     for (const [nodeId, node] of Object.entries(NODES)) {
       const dist = Math.sqrt((x - node.x) ** 2 + (y - node.y) ** 2);
-      if (dist < NODE_SIZES[node.type] + 10) {
+      if (dist < NODE_SIZES[node.type] + 15) {
         setHoveredNode(nodeId);
         return;
       }
@@ -89,9 +87,10 @@ export default function ArcticMap() {
   return (
     <div className="arctic-map-container">
       <svg
+        ref={svgRef}
         className="arctic-map"
         viewBox="0 0 800 550"
-        onClick={handleCanvasClick}
+        onClick={handleBackgroundClick}
         onMouseMove={handleMouseMove}
       >
         {/* Background gradient */}
@@ -231,7 +230,20 @@ export default function ArcticMap() {
           const weatherIcon = WEATHER_CONDITIONS[weather[nodeId]]?.icon || '☀️';
 
           return (
-            <g key={nodeId} style={{ cursor: 'pointer' }}>
+            <g 
+              key={nodeId} 
+              style={{ cursor: 'pointer' }}
+              onClick={(e) => handleNodeClick(e, nodeId)}
+            >
+              {/* Larger invisible hitbox for easier clicking */}
+              <circle
+                cx={node.x}
+                cy={node.y}
+                r={size + 15}
+                fill="transparent"
+                style={{ cursor: 'pointer' }}
+              />
+
               {/* Selection ring */}
               {isSelected && (
                 <circle
@@ -240,8 +252,9 @@ export default function ArcticMap() {
                   r={size + 8}
                   fill="none"
                   stroke="#00ff88"
-                  strokeWidth="2"
+                  strokeWidth="3"
                   className="pulse-ring"
+                  pointerEvents="none"
                 />
               )}
 
@@ -253,8 +266,9 @@ export default function ArcticMap() {
                   r={size + 6}
                   fill="none"
                   stroke={color}
-                  strokeWidth="1"
-                  opacity="0.5"
+                  strokeWidth="2"
+                  opacity="0.7"
+                  pointerEvents="none"
                 />
               )}
 
@@ -266,6 +280,7 @@ export default function ArcticMap() {
                 fill={color}
                 opacity="0.2"
                 filter="url(#glow)"
+                pointerEvents="none"
               />
 
               {/* Node circle */}
@@ -277,6 +292,7 @@ export default function ArcticMap() {
                 stroke="#ffffff"
                 strokeWidth="2"
                 filter="url(#glow)"
+                pointerEvents="none"
               />
 
               {/* Node icon based on type */}
@@ -286,6 +302,7 @@ export default function ArcticMap() {
                 textAnchor="middle"
                 fontSize="12"
                 fill="#000"
+                pointerEvents="none"
               >
                 {node.type === 'port' ? '⚓' : node.type === 'resource' ? '⛏️' : '📡'}
               </text>
@@ -299,6 +316,7 @@ export default function ArcticMap() {
                 fontSize="11"
                 fontWeight="bold"
                 className="node-label"
+                pointerEvents="none"
               >
                 {node.name}
               </text>
@@ -308,6 +326,7 @@ export default function ArcticMap() {
                 x={node.x - size - 8}
                 y={node.y - size - 4}
                 fontSize="14"
+                pointerEvents="none"
               >
                 {weatherIcon}
               </text>
@@ -367,17 +386,31 @@ export default function ArcticMap() {
           const fuelPercent = (asset.currentFuel / asset.maxFuel) * 100;
 
           return (
-            <g key={asset.id} style={{ cursor: 'pointer' }}>
+            <g 
+              key={asset.id} 
+              style={{ cursor: 'pointer' }}
+              onClick={(e) => handleAssetClick(e, asset.id)}
+            >
+              {/* Larger invisible hitbox for easier clicking */}
+              <circle
+                cx={assetX}
+                cy={assetY}
+                r="25"
+                fill="transparent"
+                style={{ cursor: 'pointer' }}
+              />
+
               {/* Selection indicator */}
               {isSelected && (
                 <circle
                   cx={assetX}
                   cy={assetY}
-                  r="20"
+                  r="22"
                   fill="none"
                   stroke="#00ff88"
-                  strokeWidth="2"
+                  strokeWidth="3"
                   className="pulse-ring"
+                  pointerEvents="none"
                 />
               )}
 
@@ -389,6 +422,7 @@ export default function ArcticMap() {
                 fill="#1a1a2e"
                 stroke={isSelected ? '#00ff88' : '#4a9eff'}
                 strokeWidth="2"
+                pointerEvents="none"
               />
 
               {/* Asset icon */}
@@ -397,6 +431,7 @@ export default function ArcticMap() {
                 y={assetY + 5}
                 textAnchor="middle"
                 fontSize="16"
+                pointerEvents="none"
               >
                 {asset.icon}
               </text>
@@ -409,6 +444,7 @@ export default function ArcticMap() {
                 height="4"
                 fill="#333"
                 rx="2"
+                pointerEvents="none"
               />
               <rect
                 x={assetX - 12}
@@ -417,6 +453,7 @@ export default function ArcticMap() {
                 height="4"
                 fill={fuelPercent > 30 ? '#00ff88' : fuelPercent > 15 ? '#ffaa00' : '#ff3333'}
                 rx="2"
+                pointerEvents="none"
               />
 
               {/* Status indicator */}
@@ -428,6 +465,7 @@ export default function ArcticMap() {
                   fontSize="9"
                   fill="#aaa"
                   className="status-text"
+                  pointerEvents="none"
                 >
                   {asset.status.toUpperCase()}
                 </text>
