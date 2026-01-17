@@ -227,18 +227,19 @@ export default function ControlPanel() {
 
               <div className="setting-item">
                 <label>
-                  <span>Refuel Cost</span>
-                  <span className="setting-value">${settings.refuelCost}M</span>
+                  <span>Fuel Cost (per 1000 units)</span>
+                  <span className="setting-value">${(settings.fuelCostPerUnit * 1000).toFixed(1)}M</span>
                 </label>
                 <input
                   type="range"
-                  min="0"
-                  max="20"
-                  step="1"
-                  value={settings.refuelCost}
-                  onChange={(e) => updateSettings({ refuelCost: parseInt(e.target.value) })}
+                  min="0.1"
+                  max="2"
+                  step="0.1"
+                  value={settings.fuelCostPerUnit * 1000}
+                  onChange={(e) => updateSettings({ fuelCostPerUnit: parseFloat(e.target.value) / 1000 })}
                   disabled={isRunning}
                 />
+                <span className="setting-hint">Cost scales with fuel needed</span>
               </div>
 
               <div className="setting-item checkbox">

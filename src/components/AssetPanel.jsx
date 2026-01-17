@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trash2, Navigation, Fuel, Anchor, Target } from 'lucide-react';
+import { Trash2, Navigation, Fuel, Anchor } from 'lucide-react';
 import { useGameStore } from '../store/gameStore';
 import { ASSET_TYPES, NODES } from '../data/arcticData';
 
@@ -9,12 +9,12 @@ export default function AssetPanel() {
     selectedAssetId,
     selectedNodeId,
     budget,
-    settings,
     threats,
     addAsset,
     removeAsset,
     selectAsset,
     refuelAsset,
+    getRefuelCost,
     interceptThreat,
   } = useGameStore();
   
@@ -116,33 +116,40 @@ export default function AssetPanel() {
                     <span>{Math.round(fuelPercent)}%</span>
                   </div>
 
-                  {isSelected && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      className="asset-actions"
-                    >
-                      <button
-                        className="action-btn refuel"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          refuelAsset(asset.id);
-                        }}
-                        disabled={!NODES[asset.position]?.canRefuel || budget < settings.refuelCost}
+                  {isSelected && (() => {
+                    const refuelCost = getRefuelCost(asset.id);
+                    const canRefuel = NODES[asset.position]?.canRefuel && refuelCost > 0 && budget >= refuelCost;
+                    const isFull = refuelCost === 0;
+                    
+                    return (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        className="asset-actions"
                       >
-                        <Fuel size={14} /> Refuel (${settings.refuelCost}M)
-                      </button>
-                      <button
-                        className="action-btn delete"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          removeAsset(asset.id);
-                        }}
-                      >
-                        <Trash2 size={14} /> Sell (+${Math.floor(ASSET_TYPES[asset.typeId].cost * 0.5)}M)
-                      </button>
-                    </motion.div>
-                  )}
+                        <button
+                          className={`action-btn refuel ${isFull ? 'full' : ''}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            refuelAsset(asset.id);
+                          }}
+                          disabled={!canRefuel}
+                        >
+                          <Fuel size={14} /> 
+                          {isFull ? 'Tank Full' : `Refuel ($${refuelCost}M)`}
+                        </button>
+                        <button
+                          className="action-btn delete"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            removeAsset(asset.id);
+                          }}
+                        >
+                          <Trash2 size={14} /> Sell (+${Math.floor(ASSET_TYPES[asset.typeId].cost * 0.5)}M)
+                        </button>
+                      </motion.div>
+                    );
+                  })()}
                   
                   {/* Intercept options for selected asset */}
                   {isSelected && detectedThreats.length > 0 && (

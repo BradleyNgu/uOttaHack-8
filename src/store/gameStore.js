@@ -39,7 +39,7 @@ const DEFAULT_SETTINGS = {
   budget: 400,
   threatFrequency: 0.3, // 0-1
   weatherSeverity: 0.3, // 0-1
-  refuelCost: 5, // cost per refuel
+  fuelCostPerUnit: 0.0005, // cost per fuel unit (in millions) - so 1000 fuel = $0.5M
   threatDamageEnabled: true,
 };
 
@@ -248,22 +248,29 @@ export const useGameStore = create((set, get) => ({
     });
   },
   
-  // Refueling now costs budget
+  // Refueling costs per unit of fuel needed
   refuelAsset: (assetId) => {
     const state = get();
     const asset = state.assets.find((a) => a.id === assetId);
     const node = NODES[asset?.position];
     
-    if (!asset || !node?.canRefuel) return;
+    if (!asset || !node?.canRefuel) return false;
     
-    // Check if can afford refuel
-    const refuelCost = state.settings.refuelCost;
-    if (state.budget < refuelCost) return;
+    // Check if already full
+    const maxFuel = ASSET_TYPES[asset.typeId].maxFuel;
+    const fuelNeeded = maxFuel - asset.currentFuel;
+    
+    if (fuelNeeded <= 0) return false; // Already full
+    
+    // Calculate cost based on fuel needed
+    const refuelCost = Math.ceil(fuelNeeded * state.settings.fuelCostPerUnit);
+    
+    if (state.budget < refuelCost) return false; // Can't afford
     
     set({
       assets: state.assets.map((a) =>
         a.id === assetId
-          ? { ...a, currentFuel: ASSET_TYPES[a.typeId].maxFuel, status: 'refueling' }
+          ? { ...a, currentFuel: maxFuel, status: 'refueling' }
           : a
       ),
       budget: state.budget - refuelCost,
@@ -276,6 +283,22 @@ export const useGameStore = create((set, get) => ({
         ),
       });
     }, 2000 / get().gameSpeed);
+    
+    return true;
+  },
+  
+  // Helper to calculate refuel cost for an asset
+  getRefuelCost: (assetId) => {
+    const state = get();
+    const asset = state.assets.find((a) => a.id === assetId);
+    if (!asset) return 0;
+    
+    const maxFuel = ASSET_TYPES[asset.typeId].maxFuel;
+    const fuelNeeded = maxFuel - asset.currentFuel;
+    
+    if (fuelNeeded <= 0) return 0;
+    
+    return Math.ceil(fuelNeeded * state.settings.fuelCostPerUnit);
   },
   
   // Node selection
