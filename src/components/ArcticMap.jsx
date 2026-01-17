@@ -17,6 +17,7 @@ const NODE_SIZES = {
 
 export default function ArcticMap() {
   const svgRef = useRef(null);
+  const containerRef = useRef(null);
   const [hoveredNode, setHoveredNode] = useState(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   
@@ -71,7 +72,16 @@ export default function ArcticMap() {
 
   const handleMouseMove = (e) => {
     const { x, y } = screenToSVG(e);
-    setMousePos({ x: e.clientX, y: e.clientY }); // Keep screen coords for tooltip
+    
+    // Get position relative to container for tooltip
+    const container = containerRef.current;
+    if (container) {
+      const containerRect = container.getBoundingClientRect();
+      setMousePos({ 
+        x: e.clientX - containerRect.left, 
+        y: e.clientY - containerRect.top 
+      });
+    }
 
     // Check for hovered node
     for (const [nodeId, node] of Object.entries(NODES)) {
@@ -85,7 +95,7 @@ export default function ArcticMap() {
   };
 
   return (
-    <div className="arctic-map-container">
+    <div className="arctic-map-container" ref={containerRef}>
       <svg
         ref={svgRef}
         className="arctic-map"
