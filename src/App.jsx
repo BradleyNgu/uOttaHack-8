@@ -100,7 +100,7 @@ function App() {
 
       {/* Footer */}
       <footer className="app-footer">
-        <span>© 2024 Arctic Sentinel - uOttaHack 8</span>
+        <span>uOttaHack 8</span>
         <span className={`status ${!isRunning ? 'stopped' : isPaused ? 'paused' : 'active'}`}>
           {!isRunning ? '⏹ SIMULATION STOPPED' : isPaused ? '⏸ SIMULATION PAUSED' : '▶ SIMULATION ACTIVE'}
         </span>
