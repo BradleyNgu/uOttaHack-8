@@ -1,0 +1,30 @@
+{
+  "name": "uottahack-8",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BradleyNgu/uOttaHack-8.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/BradleyNgu/uOttaHack-8/issues"
+  },
+  "homepage": "https://github.com/BradleyNgu/uOttaHack-8#readme",
+  "dependencies": {
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
+    "vite": "^7.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^5.1.2"
+  }
+}
