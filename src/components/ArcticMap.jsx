@@ -19,6 +19,7 @@ export default function ArcticMap() {
   const svgRef = useRef(null);
   const containerRef = useRef(null);
   const [hoveredNode, setHoveredNode] = useState(null);
+  const [hoveredEdge, setHoveredEdge] = useState(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   
   const {
@@ -169,18 +170,52 @@ export default function ArcticMap() {
           if (!fromNode || !toNode) return null;
 
           const iceColor = `rgba(100, 200, 255, ${edge.iceRisk * 0.5})`;
+          const isHovered = hoveredEdge === i;
 
           return (
             <g key={i}>
+              {/* Invisible wider hitbox for hovering */}
+              <line
+                x1={fromNode.x}
+                y1={fromNode.y}
+                x2={toNode.x}
+                y2={toNode.y}
+                stroke="transparent"
+                strokeWidth="20"
+                style={{ cursor: 'pointer' }}
+                onMouseEnter={(e) => {
+                  setHoveredEdge(i);
+                  const container = containerRef.current;
+                  if (container) {
+                    const containerRect = container.getBoundingClientRect();
+                    setMousePos({ 
+                      x: e.clientX - containerRect.left, 
+                      y: e.clientY - containerRect.top 
+                    });
+                  }
+                }}
+                onMouseLeave={() => setHoveredEdge(null)}
+                onMouseMove={(e) => {
+                  const container = containerRef.current;
+                  if (container) {
+                    const containerRect = container.getBoundingClientRect();
+                    setMousePos({ 
+                      x: e.clientX - containerRect.left, 
+                      y: e.clientY - containerRect.top 
+                    });
+                  }
+                }}
+              />
               {/* Ice risk indicator */}
               <line
                 x1={fromNode.x}
                 y1={fromNode.y}
                 x2={toNode.x}
                 y2={toNode.y}
-                stroke={iceColor}
-                strokeWidth="8"
-                opacity="0.3"
+                stroke={isHovered ? '#00d4ff' : iceColor}
+                strokeWidth={isHovered ? 12 : 8}
+                opacity={isHovered ? 0.6 : 0.3}
+                pointerEvents="none"
               />
               {/* Route line */}
               <line
@@ -188,19 +223,22 @@ export default function ArcticMap() {
                 y1={fromNode.y}
                 x2={toNode.x}
                 y2={toNode.y}
-                stroke="#3a7ca5"
-                strokeWidth="2"
+                stroke={isHovered ? '#00d4ff' : '#3a7ca5'}
+                strokeWidth={isHovered ? 3 : 2}
                 strokeDasharray="4,4"
-                opacity="0.7"
+                opacity={isHovered ? 1 : 0.7}
+                pointerEvents="none"
               />
               {/* Distance label */}
               <text
                 x={(fromNode.x + toNode.x) / 2}
                 y={(fromNode.y + toNode.y) / 2 - 5}
-                fill="#6bb8d9"
-                fontSize="9"
+                fill={isHovered ? '#fff' : '#6bb8d9'}
+                fontSize={isHovered ? 11 : 9}
+                fontWeight={isHovered ? 'bold' : 'normal'}
                 textAnchor="middle"
-                opacity="0.7"
+                opacity={isHovered ? 1 : 0.7}
+                pointerEvents="none"
               >
                 {edge.distance}nm
               </text>
@@ -510,9 +548,9 @@ export default function ArcticMap() {
         </text>
       </svg>
 
-      {/* Tooltip */}
+      {/* Tooltip for Nodes */}
       <AnimatePresence>
-        {hoveredNode && (
+        {hoveredNode && !hoveredEdge && (
           <motion.div
             className="map-tooltip"
             initial={{ opacity: 0, y: 10 }}
@@ -532,6 +570,63 @@ export default function ArcticMap() {
             {NODES[hoveredNode].canRefuel && (
               <p className="refuel">⛽ Refueling Available</p>
             )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Tooltip for Routes/Edges */}
+      <AnimatePresence>
+        {hoveredEdge !== null && (
+          <motion.div
+            className="map-tooltip route-tooltip"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            style={{
+              left: mousePos.x + 15,
+              top: mousePos.y + 15,
+            }}
+          >
+            {(() => {
+              const edge = EDGES[hoveredEdge];
+              const fromNode = NODES[edge.from];
+              const toNode = NODES[edge.to];
+              const icePercent = Math.round(edge.iceRisk * 100);
+              const iceLevel = icePercent >= 70 ? 'Severe' : icePercent >= 50 ? 'Heavy' : icePercent >= 30 ? 'Moderate' : 'Light';
+              const iceColor = icePercent >= 70 ? '#ff3b3b' : icePercent >= 50 ? '#ff9f43' : icePercent >= 30 ? '#ffd700' : '#00ff88';
+              
+              return (
+                <>
+                  <h4>🛤️ Route</h4>
+                  <p className="route-path">
+                    {fromNode.name} → {toNode.name}
+                  </p>
+                  <div className="route-stats">
+                    <div className="stat">
+                      <span className="label">Distance</span>
+                      <span className="value">{edge.distance} nm</span>
+                    </div>
+                    <div className="stat">
+                      <span className="label">Ice Conditions</span>
+                      <span className="value" style={{ color: iceColor }}>
+                        {iceLevel} ({icePercent}%)
+                      </span>
+                    </div>
+                    <div className="stat">
+                      <span className="label">Required Ice Rating</span>
+                      <span className="value">≥ {icePercent}%</span>
+                    </div>
+                  </div>
+                  <p className="route-warning">
+                    {icePercent >= 50 
+                      ? '⚠️ Icebreaker or Submarine recommended'
+                      : icePercent >= 30
+                      ? '⚠️ Patrol vessels may have difficulty'
+                      : '✓ Safe for most vessels'}
+                  </p>
+                </>
+              );
+            })()}
           </motion.div>
         )}
       </AnimatePresence>

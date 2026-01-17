@@ -529,6 +529,48 @@ body {
   margin-top: 0.25rem;
 }
 
+/* Route tooltip */
+.map-tooltip.route-tooltip {
+  min-width: 200px;
+}
+
+.map-tooltip .route-path {
+  font-size: 0.9rem;
+  color: var(--accent-cyan);
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.map-tooltip .route-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 0.5rem;
+}
+
+.map-tooltip .route-stats .stat {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+}
+
+.map-tooltip .route-stats .stat .label {
+  color: var(--text-muted);
+}
+
+.map-tooltip .route-stats .stat .value {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.map-tooltip .route-warning {
+  font-size: 0.75rem;
+  padding: 0.4rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  margin-top: 0.25rem;
+}
+
 /* Map Legend */
 .map-legend {
   position: absolute;
