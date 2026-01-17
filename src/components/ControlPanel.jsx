@@ -1,9 +1,13 @@
-import { motion } from 'framer-motion';
-import { Play, Pause, Square, RotateCcw, Zap } from 'lucide-react';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Play, Pause, Square, RotateCcw, Settings, HelpCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import { useGameStore } from '../store/gameStore';
-import { SCENARIOS, WEATHER_CONDITIONS } from '../data/arcticData';
+import { WEATHER_CONDITIONS } from '../data/arcticData';
 
 export default function ControlPanel() {
+  const [showInstructions, setShowInstructions] = useState(true);
+  const [showSettings, setShowSettings] = useState(true);
+  
   const {
     isRunning,
     isPaused,
@@ -12,14 +16,15 @@ export default function ControlPanel() {
     currentDay,
     budget,
     globalWeather,
-    activeScenario,
+    settings,
+    threatDamage,
     startGame,
     pauseGame,
     resumeGame,
     stopGame,
     resetGame,
     setGameSpeed,
-    setScenario,
+    updateSettings,
   } = useGameStore();
 
   const formatTime = (hours) => {
@@ -34,6 +39,52 @@ export default function ControlPanel() {
         <h2>🎮 COMMAND CENTER</h2>
       </div>
 
+      {/* Instructions Section */}
+      <div className="collapsible-section">
+        <button 
+          className="section-toggle"
+          onClick={() => setShowInstructions(!showInstructions)}
+        >
+          <HelpCircle size={16} />
+          <span>HOW TO PLAY</span>
+          {showInstructions ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+        </button>
+        <AnimatePresence>
+          {showInstructions && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="instructions"
+            >
+              <div className="instruction-step">
+                <span className="step-num">1</span>
+                <span>Click a <strong>cyan port</strong> on the map</span>
+              </div>
+              <div className="instruction-step">
+                <span className="step-num">2</span>
+                <span>Deploy ships from Fleet Command (right panel)</span>
+              </div>
+              <div className="instruction-step">
+                <span className="step-num">3</span>
+                <span>Click <strong>START</strong> to begin simulation</span>
+              </div>
+              <div className="instruction-step">
+                <span className="step-num">4</span>
+                <span>Select an asset, then click a node to move it</span>
+              </div>
+              <div className="instruction-step">
+                <span className="step-num">5</span>
+                <span>Intercept <strong>⚠️ threats</strong> before they expire!</span>
+              </div>
+              <div className="instruction-tip">
+                💡 <strong>Tip:</strong> Threats cost budget if not neutralized in time. Move assets to threat locations to neutralize them.
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
       <div className="time-display">
         <div className="day">DAY {currentDay}</div>
         <div className="time">{formatTime(currentTime)}</div>
@@ -45,6 +96,9 @@ export default function ControlPanel() {
       <div className="budget-display">
         <span className="label">BUDGET</span>
         <span className="value">${budget}M</span>
+        {threatDamage > 0 && (
+          <span className="damage">-${threatDamage}M lost</span>
+        )}
       </div>
 
       <div className="game-controls">
@@ -89,7 +143,7 @@ export default function ControlPanel() {
       </div>
 
       <div className="speed-controls">
-        <span className="label">SPEED</span>
+        <span className="label">SIMULATION SPEED</span>
         <div className="speed-buttons">
           {[0.5, 1, 2, 4].map((speed) => (
             <motion.button
@@ -105,34 +159,106 @@ export default function ControlPanel() {
         </div>
       </div>
 
-      <div className="scenario-select">
-        <span className="label">SCENARIO</span>
-        <div className="scenarios">
-          {Object.values(SCENARIOS).map((scenario) => (
-            <motion.button
-              key={scenario.id}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className={`scenario-btn ${activeScenario.id === scenario.id ? 'active' : ''}`}
-              onClick={() => setScenario(scenario.id)}
-              disabled={isRunning}
+      {/* Adjustable Settings */}
+      <div className="collapsible-section">
+        <button 
+          className="section-toggle"
+          onClick={() => setShowSettings(!showSettings)}
+        >
+          <Settings size={16} />
+          <span>SETTINGS</span>
+          {showSettings ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+        </button>
+        <AnimatePresence>
+          {showSettings && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="settings-panel"
             >
-              <span className="name">{scenario.name}</span>
-              <span className="threat">
-                Threat: {'🔴'.repeat(Math.ceil(scenario.threatFrequency * 5))}
-              </span>
-            </motion.button>
-          ))}
-        </div>
-      </div>
+              <div className="setting-item">
+                <label>
+                  <span>Starting Budget</span>
+                  <span className="setting-value">${settings.budget}M</span>
+                </label>
+                <input
+                  type="range"
+                  min="100"
+                  max="1000"
+                  step="50"
+                  value={settings.budget}
+                  onChange={(e) => updateSettings({ budget: parseInt(e.target.value) })}
+                  disabled={isRunning}
+                />
+              </div>
 
-      <div className="scenario-info">
-        <h4>{activeScenario.name}</h4>
-        <p>{activeScenario.description}</p>
-        <div className="stats">
-          <span>Initial Budget: ${activeScenario.initialBudget}M</span>
-          <span>Weather: {Math.round(activeScenario.weatherSeverity * 100)}% severity</span>
-        </div>
+              <div className="setting-item">
+                <label>
+                  <span>Threat Frequency</span>
+                  <span className="setting-value">{Math.round(settings.threatFrequency * 100)}%</span>
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  step="5"
+                  value={settings.threatFrequency * 100}
+                  onChange={(e) => updateSettings({ threatFrequency: parseInt(e.target.value) / 100 })}
+                  disabled={isRunning}
+                />
+              </div>
+
+              <div className="setting-item">
+                <label>
+                  <span>Weather Severity</span>
+                  <span className="setting-value">{Math.round(settings.weatherSeverity * 100)}%</span>
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  step="5"
+                  value={settings.weatherSeverity * 100}
+                  onChange={(e) => updateSettings({ weatherSeverity: parseInt(e.target.value) / 100 })}
+                  disabled={isRunning}
+                />
+              </div>
+
+              <div className="setting-item">
+                <label>
+                  <span>Refuel Cost</span>
+                  <span className="setting-value">${settings.refuelCost}M</span>
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max="20"
+                  step="1"
+                  value={settings.refuelCost}
+                  onChange={(e) => updateSettings({ refuelCost: parseInt(e.target.value) })}
+                  disabled={isRunning}
+                />
+              </div>
+
+              <div className="setting-item checkbox">
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={settings.threatDamageEnabled}
+                    onChange={(e) => updateSettings({ threatDamageEnabled: e.target.checked })}
+                    disabled={isRunning}
+                  />
+                  <span>Threats damage budget when expired</span>
+                </label>
+              </div>
+
+              {isRunning && (
+                <p className="settings-note">⚠️ Stop simulation to change settings</p>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

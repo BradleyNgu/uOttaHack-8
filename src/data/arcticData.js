@@ -206,7 +206,7 @@ export const ASSET_TYPES = {
     name: 'Patrol Aircraft',
     icon: '✈️',
     maxFuel: 20000,
-    fuelConsumption: 100,
+    fuelConsumption: 200,
     speed: 300,
     detectionRange: 150,
     iceCapability: 1.0, // flies over ice
@@ -235,12 +235,12 @@ export const WEATHER_CONDITIONS = {
   blizzard: { id: 'blizzard', name: 'Blizzard', speedModifier: 0.2, detectionModifier: 0.1, icon: '❄️' },
 };
 
-// Threat types
+// Threat types (with damage/cost impact)
 export const THREAT_TYPES = {
-  unauthorized: { id: 'unauthorized', name: 'Unauthorized Vessel', severity: 'medium', icon: '⚠️' },
-  illegal_fishing: { id: 'illegal_fishing', name: 'Illegal Fishing', severity: 'low', icon: '🎣' },
-  smuggling: { id: 'smuggling', name: 'Smuggling', severity: 'high', icon: '📦' },
-  environmental: { id: 'environmental', name: 'Environmental Hazard', severity: 'medium', icon: '🛢️' },
+  unauthorized: { id: 'unauthorized', name: 'Unauthorized Vessel', severity: 'medium', icon: '⚠️', damage: 5, timeLimit: 10 },
+  illegal_fishing: { id: 'illegal_fishing', name: 'Illegal Fishing', severity: 'low', icon: '🎣', damage: 2, timeLimit: 15 },
+  smuggling: { id: 'smuggling', name: 'Smuggling', severity: 'high', icon: '📦', damage: 10, timeLimit: 8 },
+  environmental: { id: 'environmental', name: 'Environmental Hazard', severity: 'high', icon: '🛢️', damage: 15, timeLimit: 5 },
 };
 
 // Initial scenarios

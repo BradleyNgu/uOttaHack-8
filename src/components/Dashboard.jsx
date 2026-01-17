@@ -19,10 +19,18 @@ export default function Dashboard() {
     threats,
     totalFuelUsed,
     currentDay,
+    currentTime,
     budget,
-    history,
-    activeScenario,
+    threatDamage,
+    settings,
+    isRunning,
+    isPaused,
   } = useGameStore();
+  
+  // Check if all assets are idle (movement complete)
+  const allMovementComplete = assets.length > 0 && assets.every(
+    (asset) => asset.status === 'idle' || asset.status === 'stranded' || asset.status === 'refueling'
+  );
 
   const avgResponseTime =
     stats.responseTime.length > 0
@@ -31,6 +39,13 @@ export default function Dashboard() {
 
   const activeThreats = threats.filter((t) => !t.neutralized);
   const detectedThreats = threats.filter((t) => t.detected);
+  
+  // Calculate time remaining for threats
+  const currentTotalTime = currentTime + (currentDay - 1) * 24;
+  const getThreatTimeRemaining = (threat) => {
+    const elapsed = currentTotalTime - threat.spawnTime;
+    return Math.max(0, threat.timeLimit - elapsed);
+  };
 
   // Calculate coverage
   const coveredNodes = new Set();
@@ -133,43 +148,64 @@ export default function Dashboard() {
             <span className="value">${budget}M</span>
           </div>
           <div className="status-item">
-            <span className="label">Scenario</span>
-            <span className="value">{activeScenario.name}</span>
+            <span className="label">Damage</span>
+            <span className="value" style={{ color: threatDamage > 0 ? '#ff3b3b' : 'inherit' }}>
+              ${threatDamage}M
+            </span>
           </div>
         </div>
       </div>
 
       {/* Threat Log */}
       <div className="threat-log">
-        <h3>⚠️ Threat Activity</h3>
+        <h3>⚠️ Active Threats ({activeThreats.length})</h3>
         <div className="threat-list">
           {threats.length === 0 ? (
             <div className="no-threats">
               <Shield size={24} />
               <p>No threats detected</p>
+              <p className="hint">Threats spawn randomly at patrol points</p>
             </div>
           ) : (
-            threats.slice(-5).reverse().map((threat) => (
-              <motion.div
-                key={threat.id}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                className={`threat-item ${threat.detected ? 'detected' : 'undetected'} ${threat.neutralized ? 'neutralized' : ''}`}
-              >
-                <span className="icon">{threat.type.icon}</span>
-                <div className="info">
-                  <span className="type">{threat.type.name}</span>
-                  <span className="location">
-                    <MapPin size={10} /> {NODES[threat.position]?.name}
-                  </span>
-                </div>
-                <span className={`status ${threat.neutralized ? 'success' : threat.detected ? 'warning' : 'danger'}`}>
-                  {threat.neutralized ? '✓ Neutralized' : threat.detected ? '👁️ Detected' : '❓ Unknown'}
-                </span>
-              </motion.div>
-            ))
+            threats.slice(-5).reverse().map((threat) => {
+              const timeRemaining = getThreatTimeRemaining(threat);
+              const isUrgent = timeRemaining < 3 && !threat.neutralized;
+              
+              return (
+                <motion.div
+                  key={threat.id}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className={`threat-item ${threat.detected ? 'detected' : 'undetected'} ${threat.neutralized ? 'neutralized' : ''} ${isUrgent ? 'urgent' : ''}`}
+                >
+                  <span className="icon">{threat.type.icon}</span>
+                  <div className="info">
+                    <span className="type">{threat.type.name}</span>
+                    <span className="location">
+                      <MapPin size={10} /> {NODES[threat.position]?.name}
+                    </span>
+                  </div>
+                  <div className="threat-meta">
+                    {!threat.neutralized && threat.detected && (
+                      <span className={`timer ${isUrgent ? 'urgent' : ''}`}>
+                        ⏱️ {timeRemaining.toFixed(1)}h
+                      </span>
+                    )}
+                    <span className={`status ${threat.neutralized ? 'success' : threat.detected ? 'warning' : 'danger'}`}>
+                      {threat.neutralized ? '✓ Done' : threat.detected ? '👁️ Found' : '❓ Hidden'}
+                    </span>
+                  </div>
+                </motion.div>
+              );
+            })
           )}
         </div>
+        {stats.threatsExpired > 0 && (
+          <div className="threat-stats">
+            <span className="expired">💀 {stats.threatsExpired} expired (-${threatDamage}M)</span>
+            <span className="neutralized">✅ {stats.threatsNeutralized} neutralized</span>
+          </div>
+        )}
       </div>
 
       {/* Coverage Map Mini */}
@@ -229,6 +265,9 @@ export default function Dashboard() {
           </svg>
         </div>
         <div className="efficiency-tips">
+          {isPaused && allMovementComplete && assets.length > 0 && (
+            <p className="tip success">✅ All assets arrived - simulation paused</p>
+          )}
           {coveragePercent < 50 && (
             <p className="tip">📍 Deploy more assets to increase coverage</p>
           )}

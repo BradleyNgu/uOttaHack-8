@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Trash2, Navigation, Fuel, Anchor } from 'lucide-react';
+import { Trash2, Navigation, Fuel, Anchor, Target } from 'lucide-react';
 import { useGameStore } from '../store/gameStore';
 import { ASSET_TYPES, NODES } from '../data/arcticData';
 
@@ -9,12 +9,17 @@ export default function AssetPanel() {
     selectedAssetId,
     selectedNodeId,
     budget,
+    settings,
+    threats,
     addAsset,
     removeAsset,
     selectAsset,
     refuelAsset,
-    setPatrolRoute,
+    interceptThreat,
   } = useGameStore();
+  
+  // Get detected threats for intercept options
+  const detectedThreats = threats.filter(t => t.detected && !t.neutralized);
 
   const handleAddAsset = (assetTypeId) => {
     if (selectedNodeId && NODES[selectedNodeId]?.canRefuel) {
@@ -123,9 +128,9 @@ export default function AssetPanel() {
                           e.stopPropagation();
                           refuelAsset(asset.id);
                         }}
-                        disabled={!NODES[asset.position]?.canRefuel}
+                        disabled={!NODES[asset.position]?.canRefuel || budget < settings.refuelCost}
                       >
-                        <Fuel size={14} /> Refuel
+                        <Fuel size={14} /> Refuel (${settings.refuelCost}M)
                       </button>
                       <button
                         className="action-btn delete"
@@ -134,8 +139,31 @@ export default function AssetPanel() {
                           removeAsset(asset.id);
                         }}
                       >
-                        <Trash2 size={14} /> Decommission
+                        <Trash2 size={14} /> Sell (+${Math.floor(ASSET_TYPES[asset.typeId].cost * 0.5)}M)
                       </button>
+                    </motion.div>
+                  )}
+                  
+                  {/* Intercept options for selected asset */}
+                  {isSelected && detectedThreats.length > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      className="intercept-options"
+                    >
+                      <span className="intercept-label">🎯 Intercept Threat:</span>
+                      {detectedThreats.slice(0, 3).map((threat) => (
+                        <button
+                          key={threat.id}
+                          className="intercept-btn"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            interceptThreat(asset.id, threat.id);
+                          }}
+                        >
+                          {threat.type.icon} {NODES[threat.position]?.name}
+                        </button>
+                      ))}
                     </motion.div>
                   )}
                 </motion.div>
