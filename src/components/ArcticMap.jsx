@@ -541,10 +541,10 @@ export default function ArcticMap() {
 
         {/* Map title */}
         <text x="400" y="30" textAnchor="middle" fill="#fff" fontSize="18" fontWeight="bold">
-          CANADIAN ARCTIC OPERATIONS
+          OPERATIONS MAP
         </text>
         <text x="400" y="48" textAnchor="middle" fill="#6bb8d9" fontSize="11">
-          Northwest Passage Strategic Overview
+          Canadian Arctic Patrol Overview
         </text>
       </svg>
 
@@ -568,7 +568,7 @@ export default function ArcticMap() {
               Strategic Value: {'★'.repeat(Math.floor(NODES[hoveredNode].strategicValue / 2))}
             </p>
             {NODES[hoveredNode].canRefuel && (
-              <p className="refuel">⛽ Refueling Available</p>
+              <p className="refuel">Fuel Left: {NODES[hoveredNode].fuelCapacity}</p>
             )}
           </motion.div>
         )}
@@ -645,10 +645,6 @@ export default function ArcticMap() {
         <div className="legend-item">
           <span className="dot" style={{ background: NODE_COLORS.patrol }} />
           <span>Patrol Points</span>
-        </div>
-        <div className="legend-item">
-          <span className="ice-line" />
-          <span>Ice Risk</span>
         </div>
       </div>
     </div>

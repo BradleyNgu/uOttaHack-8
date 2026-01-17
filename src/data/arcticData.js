@@ -137,6 +137,15 @@ export const NODES = {
     description: 'Western Arctic waters',
     strategicValue: 7,
   },
+  bayNode: {
+  id: 'bayNode',
+  name: 'Hudson Bay Junction',
+  type: 'patrol',
+  x: 610,
+  y: 460,
+  description: 'Strategic junction in Hudson Bay',
+  strategicValue: 8,
+},
 };
 
 export const EDGES = [
@@ -153,7 +162,8 @@ export const EDGES = [
 
   // Hudson Bay routes
   { from: 'iqaluit', to: 'hudsonStrait', distance: 180, iceRisk: 0.4 },
-  { from: 'hudsonStrait', to: 'churchill', distance: 350, iceRisk: 0.3 },
+  { from: 'churchill', to: 'bayNode', distance: 175, iceRisk: 0.3 },
+  { from: 'bayNode', to: 'hudsonStrait', distance: 175, iceRisk: 0.3 },
 
   // Cross connections
   { from: 'prudhoe', to: 'tuktoyaktuk', distance: 100, iceRisk: 0.2 },
@@ -205,8 +215,8 @@ export const ASSET_TYPES = {
     id: 'aircraft',
     name: 'Patrol Aircraft',
     icon: '✈️',
-    maxFuel: 20000,
-    fuelConsumption: 100,
+    maxFuel: 25000,
+    fuelConsumption: 75,
     speed: 300,
     detectionRange: 150,
     iceCapability: 1.0, // flies over ice
@@ -240,7 +250,6 @@ export const THREAT_TYPES = {
   unauthorized: { id: 'unauthorized', name: 'Unauthorized Vessel', severity: 'medium', icon: '⚠️' },
   illegal_fishing: { id: 'illegal_fishing', name: 'Illegal Fishing', severity: 'low', icon: '🎣' },
   smuggling: { id: 'smuggling', name: 'Smuggling', severity: 'high', icon: '📦' },
-  environmental: { id: 'environmental', name: 'Environmental Hazard', severity: 'medium', icon: '🛢️' },
 };
 
 // Initial scenarios
