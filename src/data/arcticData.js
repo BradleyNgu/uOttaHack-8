@@ -206,7 +206,7 @@ export const ASSET_TYPES = {
     name: 'Patrol Aircraft',
     icon: '✈️',
     maxFuel: 20000,
-    fuelConsumption: 200,
+    fuelConsumption: 100,
     speed: 300,
     detectionRange: 150,
     iceCapability: 1.0, // flies over ice
@@ -240,7 +240,6 @@ export const THREAT_TYPES = {
   unauthorized: { id: 'unauthorized', name: 'Unauthorized Vessel', severity: 'medium', icon: '⚠️' },
   illegal_fishing: { id: 'illegal_fishing', name: 'Illegal Fishing', severity: 'low', icon: '🎣' },
   smuggling: { id: 'smuggling', name: 'Smuggling', severity: 'high', icon: '📦' },
-  foreign_military: { id: 'foreign_military', name: 'Foreign Military', severity: 'critical', icon: '🚨' },
   environmental: { id: 'environmental', name: 'Environmental Hazard', severity: 'medium', icon: '🛢️' },
 };
 
