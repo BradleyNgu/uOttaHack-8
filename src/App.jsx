@@ -4,6 +4,7 @@ import ArcticMap from './components/ArcticMap';
 import ControlPanel from './components/ControlPanel';
 import AssetPanel from './components/AssetPanel';
 import Dashboard from './components/Dashboard';
+import GameOver from './components/GameOver';
 import { useGameStore } from './store/gameStore';
 import './App.css';
 
@@ -41,6 +42,9 @@ function App() {
 
   return (
     <div className="app">
+      {/* Game Over Overlay */}
+      <GameOver />
+
       {/* Header */}
       <motion.header
         className="app-header"

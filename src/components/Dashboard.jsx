@@ -7,7 +7,10 @@ import {
   Fuel, 
   Target,
   TrendingUp,
-  MapPin
+  MapPin,
+  Pickaxe,
+  Ship,
+  Anchor
 } from 'lucide-react';
 import { useGameStore } from '../store/gameStore';
 import { NODES } from '../data/arcticData';
@@ -25,6 +28,9 @@ export default function Dashboard() {
     settings,
     isRunning,
     isPaused,
+    resourcesMined,
+    portsVisited,
+    allPorts,
   } = useGameStore();
   
   // Check if all assets are idle (movement complete)
@@ -233,6 +239,62 @@ export default function Dashboard() {
             );
           })}
         </div>
+      </div>
+
+      {/* Mining Progress */}
+      <div className="mining-progress">
+        <h3><Pickaxe size={16} /> Resources Mined</h3>
+        <div className="mining-resources">
+          <div className="resource-row">
+            <span className="icon">🛢️</span>
+            <span className="name">Oil</span>
+            <span className="amount">{resourcesMined.oil.toLocaleString()}</span>
+          </div>
+          <div className="resource-row">
+            <span className="icon">💨</span>
+            <span className="name">Gas</span>
+            <span className="amount">{resourcesMined.gas.toLocaleString()}</span>
+          </div>
+          <div className="resource-row">
+            <span className="icon">💎</span>
+            <span className="name">Minerals</span>
+            <span className="amount">{resourcesMined.minerals.toLocaleString()}</span>
+          </div>
+        </div>
+        <p className="mining-tip">
+          <Ship size={12} /> Deploy Mining Vessel to resource nodes
+        </p>
+      </div>
+
+      {/* Trade Route Progress */}
+      <div className="trade-progress">
+        <h3><Anchor size={16} /> Trade Route ({portsVisited.length}/{allPorts.length})</h3>
+        <div className="ports-progress-bar">
+          <div 
+            className="progress-fill"
+            style={{ width: `${(portsVisited.length / allPorts.length) * 100}%` }}
+          />
+        </div>
+        <div className="ports-list">
+          {allPorts.map((portId) => {
+            const visited = portsVisited.includes(portId);
+            return (
+              <span 
+                key={portId} 
+                className={`port-badge ${visited ? 'visited' : ''}`}
+                title={NODES[portId]?.name}
+              >
+                {visited ? '✓' : '○'} {NODES[portId]?.name}
+              </span>
+            );
+          })}
+        </div>
+        {portsVisited.length === allPorts.length && (
+          <div className="all-visited">🏆 All ports visited!</div>
+        )}
+        <p className="trade-tip">
+          <Ship size={12} /> Deploy Civilian Cargo Ship to visit ports
+        </p>
       </div>
 
       {/* Resource Efficiency */}

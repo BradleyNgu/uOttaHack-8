@@ -44,10 +44,16 @@ const DEFAULT_SETTINGS = {
   threatDamageEnabled: true,
 };
 
+// Get all ports for tracking
+const ALL_PORTS = Object.keys(NODES).filter((id) => NODES[id].type === 'port');
+// Get all resource nodes
+const ALL_RESOURCES = Object.keys(NODES).filter((id) => NODES[id].type === 'resource');
+
 const initialState = {
   // Game state
   isRunning: false,
   isPaused: false,
+  isGameOver: false,
   gameSpeed: 1,
   currentTime: 0, // in hours
   currentDay: 1,
@@ -59,6 +65,15 @@ const initialState = {
   budget: DEFAULT_SETTINGS.budget,
   totalFuelUsed: 0,
   threatDamage: 0, // total damage from unhandled threats
+  
+  // Mining & Trade tracking
+  resourcesMined: {
+    oil: 0,
+    gas: 0,
+    minerals: 0,
+  },
+  portsVisited: [], // array of port IDs visited by civilian ships
+  allPorts: ALL_PORTS,
   
   // Assets
   assets: [],
@@ -130,6 +145,7 @@ export const useGameStore = create((set, get) => ({
       ...initialState,
       settings: state.settings,
       budget: state.settings.budget,
+      isGameOver: false,
     });
   },
   
@@ -160,9 +176,18 @@ export const useGameStore = create((set, get) => ({
       interceptingThreat: null,
     };
     
+    // If civilian ship is deployed at a port, track that port as visited
+    let newPortsVisited = [...state.portsVisited];
+    if (assetTypeId === 'civilianShip' && NODES[nodeId]?.type === 'port') {
+      if (!newPortsVisited.includes(nodeId)) {
+        newPortsVisited.push(nodeId);
+      }
+    }
+    
     set({
       assets: [...state.assets, newAsset],
       budget: state.budget - assetType.cost,
+      portsVisited: newPortsVisited,
     });
     
     return true;
@@ -393,7 +418,7 @@ export const useGameStore = create((set, get) => ({
   // Game tick
   tick: () => {
     const state = get();
-    if (!state.isRunning || state.isPaused) return;
+    if (!state.isRunning || state.isPaused || state.isGameOver) return;
     
     const deltaTime = 0.1 * state.gameSpeed; // hours
     let newTime = state.currentTime + deltaTime;
@@ -408,6 +433,10 @@ export const useGameStore = create((set, get) => ({
     
     // Update assets and track fuel consumed this tick
     let totalFuelConsumedThisTick = 0;
+    
+    // Track newly mined resources this tick
+    let newResourcesMined = { oil: 0, gas: 0, minerals: 0 };
+    let newPortsVisited = [...state.portsVisited];
     
     const updatedAssets = state.assets.map((asset) => {
       if (asset.status === 'moving' || asset.status === 'patrolling' || asset.status === 'intercepting') {
@@ -457,6 +486,22 @@ export const useGameStore = create((set, get) => ({
         
         if (newProgress >= 1) {
           // Arrived at next node
+          const arrivedNode = NODES[nextNode];
+          
+          // Mining ship at resource node - mine resources!
+          if (asset.typeId === 'mining' && arrivedNode?.type === 'resource') {
+            const resourceType = arrivedNode.resourceType;
+            const production = arrivedNode.production || 1000;
+            newResourcesMined[resourceType] = (newResourcesMined[resourceType] || 0) + production;
+          }
+          
+          // Civilian ship at port - track the visit!
+          if (asset.typeId === 'civilianShip' && arrivedNode?.type === 'port') {
+            if (!newPortsVisited.includes(nextNode)) {
+              newPortsVisited.push(nextNode);
+            }
+          }
+          
           return {
             ...asset,
             position: nextNode,
@@ -468,6 +513,17 @@ export const useGameStore = create((set, get) => ({
         
         return { ...asset, progress: newProgress, currentFuel: newFuel };
       }
+      
+      // Mining ships that are idle at resource nodes also mine
+      if (asset.typeId === 'mining' && asset.status === 'idle') {
+        const currentNodeData = NODES[asset.position];
+        if (currentNodeData?.type === 'resource') {
+          const resourceType = currentNodeData.resourceType;
+          const production = (currentNodeData.production || 1000) * deltaTime * 0.1; // Slower when idle
+          newResourcesMined[resourceType] = (newResourcesMined[resourceType] || 0) + production;
+        }
+      }
+      
       return asset;
     });
     
@@ -566,7 +622,17 @@ export const useGameStore = create((set, get) => ({
       : 0;
     
     // Apply threat damage and movement cost to budget (rounded to avoid decimals)
-    const newBudget = Math.max(0, Math.round((state.budget - newThreatDamage - movementCost) * 100) / 100);
+    const newBudget = Math.round((state.budget - newThreatDamage - movementCost) * 100) / 100;
+    
+    // Check for game over (budget depleted)
+    const isGameOver = newBudget <= 0;
+    
+    // Update resources mined
+    const updatedResourcesMined = {
+      oil: Math.round(state.resourcesMined.oil + newResourcesMined.oil),
+      gas: Math.round(state.resourcesMined.gas + newResourcesMined.gas),
+      minerals: Math.round(state.resourcesMined.minerals + newResourcesMined.minerals),
+    };
     
     set({
       currentTime: newTime,
@@ -574,9 +640,13 @@ export const useGameStore = create((set, get) => ({
       assets: finalAssets,
       threats: remainingThreats,
       isPaused: shouldPause ? true : state.isPaused,
-      budget: newBudget,
+      isGameOver,
+      isRunning: isGameOver ? false : state.isRunning,
+      budget: Math.max(0, newBudget),
       threatDamage: state.threatDamage + newThreatDamage,
       totalFuelUsed: state.totalFuelUsed + totalFuelConsumedThisTick,
+      resourcesMined: updatedResourcesMined,
+      portsVisited: newPortsVisited,
       stats: {
         ...state.stats,
         coverage,
