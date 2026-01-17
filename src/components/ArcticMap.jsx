@@ -375,7 +375,7 @@ export default function ArcticMap() {
           })}
 
         {/* Assets */}
-        {assets.map((asset) => {
+        {assets.map((asset, index) => {
           const node = NODES[asset.position];
           if (!node) return null;
 
@@ -383,12 +383,27 @@ export default function ArcticMap() {
           let assetX = node.x;
           let assetY = node.y;
 
-          if (asset.status === 'moving' || asset.status === 'patrolling') {
+          if (asset.status === 'moving' || asset.status === 'patrolling' || asset.status === 'intercepting') {
             const nextNodeId = asset.path[asset.pathIndex + 1];
             if (nextNodeId) {
               const nextNode = NODES[nextNodeId];
               assetX = node.x + (nextNode.x - node.x) * asset.progress;
               assetY = node.y + (nextNode.y - node.y) * asset.progress;
+            }
+          } else {
+            // Offset idle assets at the same node so they don't overlap
+            const assetsAtSameNode = assets.filter(a => 
+              a.position === asset.position && 
+              (a.status === 'idle' || a.status === 'stranded' || a.status === 'refueling')
+            );
+            const assetIndexAtNode = assetsAtSameNode.findIndex(a => a.id === asset.id);
+            
+            if (assetsAtSameNode.length > 1 && assetIndexAtNode >= 0) {
+              // Spread assets in a circle around the node
+              const angle = (assetIndexAtNode / assetsAtSameNode.length) * 2 * Math.PI - Math.PI / 2;
+              const offsetRadius = 25 + (assetsAtSameNode.length > 3 ? 10 : 0);
+              assetX = node.x + Math.cos(angle) * offsetRadius;
+              assetY = node.y + Math.sin(angle) * offsetRadius;
             }
           }
 
@@ -405,7 +420,7 @@ export default function ArcticMap() {
               <circle
                 cx={assetX}
                 cy={assetY}
-                r="25"
+                r="18"
                 fill="transparent"
                 style={{ cursor: 'pointer' }}
               />

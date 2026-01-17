@@ -206,7 +206,7 @@ export const ASSET_TYPES = {
     name: 'Patrol Aircraft',
     icon: '✈️',
     maxFuel: 20000,
-    fuelConsumption: 200,
+    fuelConsumption: 100,
     speed: 300,
     detectionRange: 150,
     iceCapability: 1.0, // flies over ice
