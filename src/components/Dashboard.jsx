@@ -109,7 +109,7 @@ export default function Dashboard() {
   return (
     <div className="dashboard">
       <div className="panel-header">
-        <h2>📊 STRATEGIC OVERVIEW</h2>
+        <h2>STRATEGIC OVERVIEW</h2>
       </div>
 
       {/* Key Metrics */}

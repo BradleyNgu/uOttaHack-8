@@ -36,7 +36,7 @@ export default function ControlPanel() {
   return (
     <div className="control-panel">
       <div className="panel-header">
-        <h2>🎮 COMMAND CENTER</h2>
+        <h2>COMMAND CENTER</h2>
       </div>
 
       {/* Instructions Section */}

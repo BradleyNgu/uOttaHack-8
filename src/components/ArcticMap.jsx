@@ -570,6 +570,9 @@ export default function ArcticMap() {
             {NODES[hoveredNode].canRefuel && (
               <p className="refuel">Fuel Left: {NODES[hoveredNode].fuelCapacity}</p>
             )}
+            <p className="weather" style={{ color: '#00ff88' }}>
+              Current Weather: {WEATHER_CONDITIONS[weather[hoveredNode]]?.name} {' '}
+            </p>
           </motion.div>
         )}
       </AnimatePresence>

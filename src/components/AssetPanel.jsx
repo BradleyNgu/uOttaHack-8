@@ -32,7 +32,7 @@ export default function AssetPanel() {
   return (
     <div className="asset-panel">
       <div className="panel-header">
-        <h2>🚢 FLEET COMMAND</h2>
+        <h2>FLEET COMMAND</h2>
       </div>
 
       {/* Add Assets Section */}
