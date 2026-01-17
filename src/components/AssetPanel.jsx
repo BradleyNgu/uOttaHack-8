@@ -166,6 +166,7 @@ export default function AssetPanel() {
                           onClick={(e) => {
                             e.stopPropagation();
                             interceptThreat(asset.id, threat.id);
+                            selectAsset(null); // Deselect so user can command another asset
                           }}
                         >
                           {threat.type.icon} {NODES[threat.position]?.name}

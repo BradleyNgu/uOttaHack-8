@@ -52,6 +52,8 @@ export default function ArcticMap() {
     e.stopPropagation();
     if (selectedAssetId) {
       moveAsset(selectedAssetId, nodeId);
+      // Deselect asset after giving move command so user can select another
+      selectAsset(null);
     } else {
       selectNode(nodeId);
     }
