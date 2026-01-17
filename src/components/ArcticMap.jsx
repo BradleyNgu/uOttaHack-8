@@ -32,7 +32,15 @@ export default function ArcticMap() {
     weather,
     threats,
     isRunning,
+    currentIceRisk,
+    clearedIce,
+    currentDay,
   } = useGameStore();
+  
+  // Helper to get edge key (same as in gameStore)
+  const getEdgeKey = (from, to) => {
+    return from < to ? `${from}-${to}` : `${to}-${from}`;
+  };
 
   // Convert screen coordinates to SVG viewBox coordinates
   const screenToSVG = (e) => {
@@ -169,7 +177,16 @@ export default function ArcticMap() {
           const toNode = NODES[edge.to];
           if (!fromNode || !toNode) return null;
 
-          const iceColor = `rgba(100, 200, 255, ${edge.iceRisk * 0.5})`;
+          // Get dynamic ice risk (may be cleared by icebreaker)
+          const edgeKey = getEdgeKey(edge.from, edge.to);
+          const dynamicIceRisk = currentIceRisk?.[edgeKey] ?? edge.iceRisk;
+          const isCleared = clearedIce?.[edgeKey] !== undefined;
+          const daysUntilReform = isCleared ? 7 - (currentDay - clearedIce[edgeKey].clearedOnDay) : 0;
+          
+          // Cleared paths are shown in green, icy paths in blue
+          const iceColor = isCleared 
+            ? 'rgba(0, 255, 136, 0.5)' 
+            : `rgba(100, 200, 255, ${dynamicIceRisk * 0.5})`;
           const isHovered = hoveredEdge === i;
 
           return (
@@ -212,9 +229,9 @@ export default function ArcticMap() {
                 y1={fromNode.y}
                 x2={toNode.x}
                 y2={toNode.y}
-                stroke={isHovered ? '#00d4ff' : iceColor}
+                stroke={isHovered ? (isCleared ? '#00ff88' : '#00d4ff') : iceColor}
                 strokeWidth={isHovered ? 12 : 8}
-                opacity={isHovered ? 0.6 : 0.3}
+                opacity={isHovered ? 0.6 : (isCleared ? 0.4 : 0.3)}
                 pointerEvents="none"
               />
               {/* Route line */}
@@ -223,17 +240,31 @@ export default function ArcticMap() {
                 y1={fromNode.y}
                 x2={toNode.x}
                 y2={toNode.y}
-                stroke={isHovered ? '#00d4ff' : '#3a7ca5'}
+                stroke={isCleared ? '#00ff88' : (isHovered ? '#00d4ff' : '#3a7ca5')}
                 strokeWidth={isHovered ? 3 : 2}
-                strokeDasharray="4,4"
+                strokeDasharray={isCleared ? "8,2" : "4,4"}
                 opacity={isHovered ? 1 : 0.7}
                 pointerEvents="none"
               />
+              {/* Cleared indicator */}
+              {isCleared && (
+                <text
+                  x={(fromNode.x + toNode.x) / 2}
+                  y={(fromNode.y + toNode.y) / 2 + 10}
+                  fill="#00ff88"
+                  fontSize="8"
+                  textAnchor="middle"
+                  opacity="0.9"
+                  pointerEvents="none"
+                >
+                  🧊 CLEARED ({daysUntilReform}d)
+                </text>
+              )}
               {/* Distance label */}
               <text
                 x={(fromNode.x + toNode.x) / 2}
                 y={(fromNode.y + toNode.y) / 2 - 5}
-                fill={isHovered ? '#fff' : '#6bb8d9'}
+                fill={isCleared ? '#00ff88' : (isHovered ? '#fff' : '#6bb8d9')}
                 fontSize={isHovered ? 11 : 9}
                 fontWeight={isHovered ? 'bold' : 'normal'}
                 textAnchor="middle"
@@ -606,13 +637,16 @@ export default function ArcticMap() {
               const edge = EDGES[hoveredEdge];
               const fromNode = NODES[edge.from];
               const toNode = NODES[edge.to];
-              const icePercent = Math.round(edge.iceRisk * 100);
-              const iceLevel = icePercent >= 70 ? 'Severe' : icePercent >= 50 ? 'Heavy' : icePercent >= 30 ? 'Moderate' : 'Light';
-              const iceColor = icePercent >= 70 ? '#ff3b3b' : icePercent >= 50 ? '#ff9f43' : icePercent >= 30 ? '#ffd700' : '#00ff88';
+              const edgeKey = getEdgeKey(edge.from, edge.to);
+              const dynamicIce = currentIceRisk?.[edgeKey] ?? edge.iceRisk;
+              const isRouteCleared = clearedIce?.[edgeKey] !== undefined;
+              const icePercent = Math.round(dynamicIce * 100);
+              const iceLevel = icePercent === 0 ? 'Cleared' : icePercent >= 70 ? 'Severe' : icePercent >= 50 ? 'Heavy' : icePercent >= 30 ? 'Moderate' : 'Light';
+              const iceColor = icePercent === 0 ? '#00ff88' : icePercent >= 70 ? '#ff3b3b' : icePercent >= 50 ? '#ff9f43' : icePercent >= 30 ? '#ffd700' : '#00ff88';
               
               return (
                 <>
-                  <h4>🛤️ Route</h4>
+                  <h4>🛤️ Route {isRouteCleared && '🧊 CLEARED'}</h4>
                   <p className="route-path">
                     {fromNode.name} → {toNode.name}
                   </p>
@@ -633,8 +667,10 @@ export default function ArcticMap() {
                     </div>
                   </div>
                   <p className="route-warning">
-                    {icePercent >= 50 
-                      ? '⚠️ Icebreaker or Submarine recommended'
+                    {isRouteCleared
+                      ? '✅ Any ship can pass through!'
+                      : icePercent >= 50 
+                      ? '⚠️ Icebreaker recommended'
                       : icePercent >= 30
                       ? '⚠️ Patrol vessels may have difficulty'
                       : '✓ Safe for most vessels'}

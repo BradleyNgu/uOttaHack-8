@@ -10,10 +10,11 @@ import {
   MapPin,
   Pickaxe,
   Ship,
-  Anchor
+  Anchor,
+  Snowflake
 } from 'lucide-react';
 import { useGameStore } from '../store/gameStore';
-import { NODES } from '../data/arcticData';
+import { NODES, EDGES } from '../data/arcticData';
 
 export default function Dashboard() {
   const {
@@ -31,6 +32,7 @@ export default function Dashboard() {
     resourcesMined,
     portsVisited,
     allPorts,
+    clearedIce,
   } = useGameStore();
   
   // Check if all assets are idle (movement complete)
@@ -294,6 +296,37 @@ export default function Dashboard() {
         )}
         <p className="trade-tip">
           <Ship size={12} /> Deploy Civilian Cargo Ship to visit ports
+        </p>
+      </div>
+
+      {/* Ice Clearing Status */}
+      <div className="ice-status">
+        <h3><Snowflake size={16} /> Ice Cleared Routes ({Object.keys(clearedIce || {}).length})</h3>
+        {Object.keys(clearedIce || {}).length === 0 ? (
+          <p className="no-ice-cleared">No routes cleared yet</p>
+        ) : (
+          <div className="cleared-routes">
+            {Object.entries(clearedIce || {}).map(([edgeKey, data]) => {
+              const [from, to] = edgeKey.split('-');
+              const fromName = NODES[from]?.name || from;
+              const toName = NODES[to]?.name || to;
+              const daysRemaining = 7 - (currentDay - data.clearedOnDay);
+              
+              return (
+                <div key={edgeKey} className="cleared-route">
+                  <span className="route-name">
+                    {fromName.substring(0, 10)} ↔ {toName.substring(0, 10)}
+                  </span>
+                  <span className="reform-timer">
+                    🧊 {daysRemaining}d until reform
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        )}
+        <p className="ice-tip">
+          <Snowflake size={12} /> Deploy Icebreaker to clear frozen routes
         </p>
       </div>
 

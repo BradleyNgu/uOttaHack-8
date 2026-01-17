@@ -1654,6 +1654,70 @@ body {
 }
 
 /* ============================================
+   Ice Status
+   ============================================ */
+
+.ice-status {
+  background: var(--bg-tertiary);
+  border-radius: 8px;
+  padding: 1rem;
+  border: 1px solid var(--border-color);
+}
+
+.ice-status h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #87ceeb;
+  margin-bottom: 0.75rem;
+}
+
+.no-ice-cleared {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-style: italic;
+  text-align: center;
+  padding: 0.5rem;
+}
+
+.cleared-routes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.cleared-route {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.4rem 0.6rem;
+  background: rgba(0, 255, 136, 0.1);
+  border-radius: 4px;
+  border: 1px solid rgba(0, 255, 136, 0.2);
+}
+
+.cleared-route .route-name {
+  font-size: 0.75rem;
+  color: var(--accent-green);
+}
+
+.cleared-route .reform-timer {
+  font-size: 0.7rem;
+  color: #87ceeb;
+}
+
+.ice-tip {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-top: 0.75rem;
+  font-style: italic;
+}
+
+/* ============================================
    Game Over Screen
    ============================================ */
 

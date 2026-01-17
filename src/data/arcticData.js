@@ -225,7 +225,7 @@ export const ASSET_TYPES = {
   },
   longDistance: {
     id: 'longDistance',
-    name: 'Long Distane Support Vessel',
+    name: 'Long Distance Support Vessel',
     icon: '🐋',
     maxFuel: 100000,
     fuelConsumption: 60,
@@ -234,6 +234,19 @@ export const ASSET_TYPES = {
     iceCapability: 0.9, 
     payload: 300,
     cost: 150,
+  },
+  icebreaker: {
+    id: 'icebreaker',
+    name: 'Icebreaker',
+    icon: '🧊',
+    maxFuel: 80000,
+    fuelConsumption: 100,
+    speed: 12,
+    detectionRange: 35,
+    iceCapability: 1.0, // can break through any ice
+    payload: 150,
+    cost: 120,
+    clearsIce: true, // special ability
   },
 };
 

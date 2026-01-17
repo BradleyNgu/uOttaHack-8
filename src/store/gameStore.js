@@ -49,6 +49,18 @@ const ALL_PORTS = Object.keys(NODES).filter((id) => NODES[id].type === 'port');
 // Get all resource nodes
 const ALL_RESOURCES = Object.keys(NODES).filter((id) => NODES[id].type === 'resource');
 
+// Store original ice risk values for reformation
+const ORIGINAL_ICE_RISK = {};
+EDGES.forEach((edge, index) => {
+  const edgeKey = `${edge.from}-${edge.to}`;
+  ORIGINAL_ICE_RISK[edgeKey] = edge.iceRisk;
+});
+
+// Helper to get edge key (normalized so both directions match)
+const getEdgeKey = (from, to) => {
+  return from < to ? `${from}-${to}` : `${to}-${from}`;
+};
+
 const initialState = {
   // Game state
   isRunning: false,
@@ -75,6 +87,9 @@ const initialState = {
   portsVisited: [], // array of port IDs visited by civilian ships
   allPorts: ALL_PORTS,
   
+  // Ice clearing tracking - { edgeKey: { clearedOnDay: number, originalIceRisk: number } }
+  clearedIce: {},
+  
   // Assets
   assets: [],
   selectedAssetId: null,
@@ -82,6 +97,12 @@ const initialState = {
   // Map state
   nodes: NODES,
   edges: EDGES,
+  // Dynamic ice risk (modified by icebreakers)
+  currentIceRisk: EDGES.reduce((acc, edge) => {
+    const key = getEdgeKey(edge.from, edge.to);
+    acc[key] = edge.iceRisk;
+    return acc;
+  }, {}),
   selectedNodeId: null,
   
   // Weather (per region/node)
@@ -141,11 +162,20 @@ export const useGameStore = create((set, get) => ({
   
   resetGame: () => {
     const state = get();
+    // Reset ice risk to original values
+    const resetIceRisk = EDGES.reduce((acc, edge) => {
+      const key = getEdgeKey(edge.from, edge.to);
+      acc[key] = edge.iceRisk;
+      return acc;
+    }, {});
+    
     set({
       ...initialState,
       settings: state.settings,
       budget: state.settings.budget,
       isGameOver: false,
+      clearedIce: {},
+      currentIceRisk: resetIceRisk,
     });
   },
   
@@ -438,6 +468,10 @@ export const useGameStore = create((set, get) => ({
     let newResourcesMined = { oil: 0, gas: 0, minerals: 0 };
     let newPortsVisited = [...state.portsVisited];
     
+    // Track ice cleared this tick
+    let newClearedIce = { ...state.clearedIce };
+    let newIceRisk = { ...state.currentIceRisk };
+    
     const updatedAssets = state.assets.map((asset) => {
       if (asset.status === 'moving' || asset.status === 'patrolling' || asset.status === 'intercepting') {
         if (asset.path.length <= 1) return { ...asset, status: 'idle' };
@@ -460,12 +494,16 @@ export const useGameStore = create((set, get) => ({
         
         if (!edge) return asset;
         
+        // Get current ice risk (may have been cleared by icebreaker)
+        const edgeKey = getEdgeKey(currentNode, nextNode);
+        const currentEdgeIceRisk = newIceRisk[edgeKey] ?? edge.iceRisk;
+        
         // Calculate speed with weather modifier
         const weatherCondition = WEATHER_CONDITIONS[state.weather[currentNode]];
         const effectiveSpeed = asset.speed * weatherCondition.speedModifier;
         
-        // Check ice capability
-        if (edge.iceRisk > asset.iceCapability && asset.typeId !== 'aircraft') {
+        // Check ice capability (use dynamic ice risk)
+        if (currentEdgeIceRisk > asset.iceCapability && asset.typeId !== 'aircraft') {
           return asset; // Can't traverse this edge
         }
         
@@ -487,6 +525,18 @@ export const useGameStore = create((set, get) => ({
         if (newProgress >= 1) {
           // Arrived at next node
           const arrivedNode = NODES[nextNode];
+          
+          // Icebreaker clears ice on the edge it just traversed!
+          if (asset.typeId === 'icebreaker' || ASSET_TYPES[asset.typeId]?.clearsIce) {
+            const traversedEdgeKey = getEdgeKey(currentNode, nextNode);
+            if (newIceRisk[traversedEdgeKey] > 0) {
+              newIceRisk[traversedEdgeKey] = 0;
+              newClearedIce[traversedEdgeKey] = {
+                clearedOnDay: newDay,
+                originalIceRisk: edge.iceRisk,
+              };
+            }
+          }
           
           // Mining ship at resource node - mine resources!
           if (asset.typeId === 'mining' && arrivedNode?.type === 'resource') {
@@ -634,6 +684,17 @@ export const useGameStore = create((set, get) => ({
       minerals: Math.round(state.resourcesMined.minerals + newResourcesMined.minerals),
     };
     
+    // Ice reformation - check for edges that were cleared 7+ days ago
+    const ICE_REFORM_DAYS = 7;
+    Object.entries(newClearedIce).forEach(([edgeKey, data]) => {
+      const daysSinceCleared = newDay - data.clearedOnDay;
+      if (daysSinceCleared >= ICE_REFORM_DAYS) {
+        // Ice reforms back to original value
+        newIceRisk[edgeKey] = data.originalIceRisk;
+        delete newClearedIce[edgeKey];
+      }
+    });
+    
     set({
       currentTime: newTime,
       currentDay: newDay,
@@ -647,6 +708,8 @@ export const useGameStore = create((set, get) => ({
       totalFuelUsed: state.totalFuelUsed + totalFuelConsumedThisTick,
       resourcesMined: updatedResourcesMined,
       portsVisited: newPortsVisited,
+      clearedIce: newClearedIce,
+      currentIceRisk: newIceRisk,
       stats: {
         ...state.stats,
         coverage,
