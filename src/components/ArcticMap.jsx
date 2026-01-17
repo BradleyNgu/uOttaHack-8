@@ -98,7 +98,7 @@ export default function ArcticMap() {
   };
 
   return (
-    <div className="arctic-map-container" ref={containerRef}>
+    <div className="arctic-map-container" ref={containerRef} style={{ position: 'relative' }}>
       <svg
         ref={svgRef}
         className="arctic-map"
@@ -546,6 +546,18 @@ export default function ArcticMap() {
         <text x="400" y="48" textAnchor="middle" fill="#6bb8d9" fontSize="11">
           Canadian Arctic Patrol Overview
         </text>
+
+        {/* Legend */}
+        <g className="map-legend-svg">
+          <rect x="10" y="440" width="120" height="100" fill="rgba(0, 0, 0, 0.7)" rx="5" />
+          <text x="20" y="460" fill="#fff" fontSize="14" fontWeight="bold">LEGEND</text>
+          <circle cx="20" cy="475" r="4" fill={NODE_COLORS.port} />
+          <text x="30" y="480" fill="#fff" fontSize="11">Ports</text>
+          <circle cx="20" cy="495" r="4" fill={NODE_COLORS.resource} />
+          <text x="30" y="500" fill="#fff" fontSize="11">Resources</text>
+          <circle cx="20" cy="515" r="4" fill={NODE_COLORS.patrol} />
+          <text x="30" y="520" fill="#fff" fontSize="11">Patrol Points</text>
+        </g>
       </svg>
 
       {/* Tooltip for Nodes */}
@@ -633,23 +645,6 @@ export default function ArcticMap() {
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Legend */}
-      <div className="map-legend">
-        <h4>LEGEND</h4>
-        <div className="legend-item">
-          <span className="dot" style={{ background: NODE_COLORS.port }} />
-          <span>Ports</span>
-        </div>
-        <div className="legend-item">
-          <span className="dot" style={{ background: NODE_COLORS.resource }} />
-          <span>Resources</span>
-        </div>
-        <div className="legend-item">
-          <span className="dot" style={{ background: NODE_COLORS.patrol }} />
-          <span>Patrol Points</span>
-        </div>
-      </div>
     </div>
   );
 }
