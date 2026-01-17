@@ -165,17 +165,17 @@ export const EDGES = [
 
 // Asset Types with capabilities
 export const ASSET_TYPES = {
-  icebreaker: {
-    id: 'icebreaker',
-    name: 'Icebreaker',
-    icon: '🚢',
-    maxFuel: 50000,
-    fuelConsumption: 100, // per distance unit
-    speed: 15, // knots equivalent
-    detectionRange: 50,
-    iceCapability: 0.9, // can traverse 90% ice
-    payload: 500,
-    cost: 100,
+  civilianShip: {
+    id: 'civilianShip',
+    name: 'Civilian Cargo Ship',
+    icon: '⛴️',
+    maxFuel: 40000,
+    fuelConsumption: 80,
+    speed: 20,
+    detectionRange: 30,
+    iceCapability: 0.3,
+    payload: 800,
+    cost: 60,
   },
   patrol: {
     id: 'patrol',
@@ -189,14 +189,14 @@ export const ASSET_TYPES = {
     payload: 200,
     cost: 50,
   },
-  drone: {
-    id: 'drone',
-    name: 'Maritime Drone',
+  mining: {
+    id: 'mining',
+    name: 'Mining Vessel',
     icon: '🤖',
     maxFuel: 5000,
     fuelConsumption: 10,
-    speed: 40,
-    detectionRange: 80,
+    speed: 20,
+    detectionRange: 10,
     iceCapability: 0.2,
     payload: 50,
     cost: 20,
@@ -213,15 +213,15 @@ export const ASSET_TYPES = {
     payload: 100,
     cost: 80,
   },
-  submarine: {
-    id: 'submarine',
-    name: 'Submarine',
+  longDistance: {
+    id: 'longDistance',
+    name: 'Long Distane Support Vessel',
     icon: '🐋',
-    maxFuel: 80000,
-    fuelConsumption: 80,
-    speed: 20,
+    maxFuel: 100000,
+    fuelConsumption: 60,
+    speed: 15,
     detectionRange: 60,
-    iceCapability: 0.95, // can go under ice
+    iceCapability: 0.9, 
     payload: 300,
     cost: 150,
   },
@@ -235,12 +235,12 @@ export const WEATHER_CONDITIONS = {
   blizzard: { id: 'blizzard', name: 'Blizzard', speedModifier: 0.2, detectionModifier: 0.1, icon: '❄️' },
 };
 
-// Threat types (with damage/cost impact)
+// Threat types
 export const THREAT_TYPES = {
-  unauthorized: { id: 'unauthorized', name: 'Unauthorized Vessel', severity: 'medium', icon: '⚠️', damage: 5, timeLimit: 10 },
-  illegal_fishing: { id: 'illegal_fishing', name: 'Illegal Fishing', severity: 'low', icon: '🎣', damage: 2, timeLimit: 15 },
-  smuggling: { id: 'smuggling', name: 'Smuggling', severity: 'high', icon: '📦', damage: 10, timeLimit: 8 },
-  environmental: { id: 'environmental', name: 'Environmental Hazard', severity: 'high', icon: '🛢️', damage: 15, timeLimit: 5 },
+  unauthorized: { id: 'unauthorized', name: 'Unauthorized Vessel', severity: 'medium', icon: '⚠️' },
+  illegal_fishing: { id: 'illegal_fishing', name: 'Illegal Fishing', severity: 'low', icon: '🎣' },
+  smuggling: { id: 'smuggling', name: 'Smuggling', severity: 'high', icon: '📦' },
+  environmental: { id: 'environmental', name: 'Environmental Hazard', severity: 'medium', icon: '🛢️' },
 };
 
 // Initial scenarios
