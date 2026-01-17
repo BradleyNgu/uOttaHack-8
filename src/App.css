@@ -626,8 +626,19 @@ body {
 }
 
 .asset-type-btn:disabled {
-  opacity: 0.4;
+  opacity: 0.5;
   cursor: not-allowed;
+}
+
+.asset-type-btn.deployed {
+  background: rgba(0, 255, 136, 0.1);
+  border-color: var(--accent-green);
+  opacity: 0.7;
+}
+
+.asset-type-btn.deployed .cost {
+  color: var(--accent-green) !important;
+  font-weight: 600;
 }
 
 .asset-type-btn .icon {

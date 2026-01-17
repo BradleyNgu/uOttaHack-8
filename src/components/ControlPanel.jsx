@@ -95,9 +95,9 @@ export default function ControlPanel() {
 
       <div className="budget-display">
         <span className="label">BUDGET</span>
-        <span className="value">${budget}M</span>
+        <span className="value">${Math.round(budget)}M</span>
         {threatDamage > 0 && (
-          <span className="damage">-${threatDamage}M lost</span>
+          <span className="damage">-${Math.round(threatDamage)}M lost</span>
         )}
       </div>
 
@@ -240,6 +240,18 @@ export default function ControlPanel() {
                   disabled={isRunning}
                 />
                 <span className="setting-hint">Cost scales with fuel needed</span>
+              </div>
+
+              <div className="setting-item checkbox">
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={settings.movementCostEnabled}
+                    onChange={(e) => updateSettings({ movementCostEnabled: e.target.checked })}
+                    disabled={isRunning}
+                  />
+                  <span>Charge for fuel while moving (off = free movement)</span>
+                </label>
               </div>
 
               <div className="setting-item checkbox">

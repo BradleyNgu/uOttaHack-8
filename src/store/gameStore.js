@@ -40,6 +40,7 @@ const DEFAULT_SETTINGS = {
   threatFrequency: 0.3, // 0-1
   weatherSeverity: 0.3, // 0-1
   fuelCostPerUnit: 0.0005, // cost per fuel unit (in millions) - so 1000 fuel = $0.5M
+  movementCostEnabled: false, // movement is FREE by default, only refueling costs
   threatDamageEnabled: true,
 };
 
@@ -112,11 +113,10 @@ export const useGameStore = create((set, get) => ({
   
   // Game controls
   startGame: () => {
-    const state = get();
     set({ 
       isRunning: true, 
       isPaused: false,
-      budget: state.settings.budget,
+      // Don't reset budget - keep current budget (which may have had assets deployed)
     });
   },
   pauseGame: () => set({ isPaused: true }),
@@ -139,6 +139,10 @@ export const useGameStore = create((set, get) => ({
     const state = get();
     
     if (!assetType || state.budget < assetType.cost) return false;
+    
+    // Check if this asset type is already deployed (only one of each type allowed)
+    const alreadyDeployed = state.assets.some((a) => a.typeId === assetTypeId);
+    if (alreadyDeployed) return false;
     
     const newAsset = {
       id: generateId(),
@@ -402,7 +406,9 @@ export const useGameStore = create((set, get) => ({
     
     const currentTotalTime = newTime + (newDay - 1) * 24;
     
-    // Update assets
+    // Update assets and track fuel consumed this tick
+    let totalFuelConsumedThisTick = 0;
+    
     const updatedAssets = state.assets.map((asset) => {
       if (asset.status === 'moving' || asset.status === 'patrolling' || asset.status === 'intercepting') {
         if (asset.path.length <= 1) return { ...asset, status: 'idle' };
@@ -441,6 +447,9 @@ export const useGameStore = create((set, get) => ({
         // Fuel consumption
         const fuelUsed = asset.fuelConsumption * distancePerTick * edge.distance;
         const newFuel = Math.max(0, asset.currentFuel - fuelUsed);
+        
+        // Track fuel consumed for budget deduction
+        totalFuelConsumedThisTick += fuelUsed;
         
         if (newFuel <= 0) {
           return { ...asset, status: 'stranded', currentFuel: 0 };
@@ -551,8 +560,13 @@ export const useGameStore = create((set, get) => ({
       (asset) => asset.status === 'moving' || asset.status === 'patrolling' || asset.status === 'intercepting'
     );
     
-    // Apply threat damage to budget
-    const newBudget = Math.max(0, state.budget - newThreatDamage);
+    // Calculate movement cost (fuel consumed costs budget)
+    const movementCost = state.settings.movementCostEnabled 
+      ? totalFuelConsumedThisTick * state.settings.fuelCostPerUnit 
+      : 0;
+    
+    // Apply threat damage and movement cost to budget (rounded to avoid decimals)
+    const newBudget = Math.max(0, Math.round((state.budget - newThreatDamage - movementCost) * 100) / 100);
     
     set({
       currentTime: newTime,
@@ -562,7 +576,7 @@ export const useGameStore = create((set, get) => ({
       isPaused: shouldPause ? true : state.isPaused,
       budget: newBudget,
       threatDamage: state.threatDamage + newThreatDamage,
-      totalFuelUsed: state.totalFuelUsed + finalAssets.reduce((sum, a) => sum + (a.currentFuel < ASSET_TYPES[a.typeId].maxFuel ? ASSET_TYPES[a.typeId].fuelConsumption * deltaTime : 0), 0),
+      totalFuelUsed: state.totalFuelUsed + totalFuelConsumedThisTick,
       stats: {
         ...state.stats,
         coverage,

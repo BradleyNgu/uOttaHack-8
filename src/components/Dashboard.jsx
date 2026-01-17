@@ -145,12 +145,12 @@ export default function Dashboard() {
           </div>
           <div className="status-item">
             <span className="label">Budget</span>
-            <span className="value">${budget}M</span>
+            <span className="value">${Math.round(budget)}M</span>
           </div>
           <div className="status-item">
             <span className="label">Damage</span>
             <span className="value" style={{ color: threatDamage > 0 ? '#ff3b3b' : 'inherit' }}>
-              ${threatDamage}M
+              ${Math.round(threatDamage)}M
             </span>
           </div>
         </div>
@@ -202,7 +202,7 @@ export default function Dashboard() {
         </div>
         {stats.threatsExpired > 0 && (
           <div className="threat-stats">
-            <span className="expired">💀 {stats.threatsExpired} expired (-${threatDamage}M)</span>
+            <span className="expired">💀 {stats.threatsExpired} expired (-${Math.round(threatDamage)}M)</span>
             <span className="neutralized">✅ {stats.threatsNeutralized} neutralized</span>
           </div>
         )}

@@ -37,34 +37,42 @@ export default function AssetPanel() {
 
       {/* Add Assets Section */}
       <div className="add-assets">
-        <h3>Deploy Assets</h3>
+        <h3>Deploy Assets (1 of each type)</h3>
         <p className="hint">
           {selectedNodeId && NODES[selectedNodeId]?.canRefuel
             ? `Deploy to: ${NODES[selectedNodeId].name}`
             : 'Select a port to deploy assets'}
         </p>
         <div className="asset-types">
-          {Object.values(ASSET_TYPES).map((type) => (
-            <motion.button
-              key={type.id}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className={`asset-type-btn ${budget < type.cost ? 'disabled' : ''}`}
-              onClick={() => handleAddAsset(type.id)}
-              disabled={!selectedNodeId || !NODES[selectedNodeId]?.canRefuel || budget < type.cost}
-            >
-              <span className="icon">{type.icon}</span>
-              <div className="info">
-                <span className="name">{type.name}</span>
-                <span className="cost">${type.cost}M</span>
-              </div>
-              <div className="stats">
-                <span>⚡ {type.speed}kn</span>
-                <span>👁️ {type.detectionRange}nm</span>
-                <span>❄️ {Math.round(type.iceCapability * 100)}%</span>
-              </div>
-            </motion.button>
-          ))}
+          {Object.values(ASSET_TYPES).map((type) => {
+            const isDeployed = assets.some((a) => a.typeId === type.id);
+            const canAfford = budget >= type.cost;
+            const canDeploy = selectedNodeId && NODES[selectedNodeId]?.canRefuel && canAfford && !isDeployed;
+            
+            return (
+              <motion.button
+                key={type.id}
+                whileHover={{ scale: canDeploy ? 1.02 : 1 }}
+                whileTap={{ scale: canDeploy ? 0.98 : 1 }}
+                className={`asset-type-btn ${isDeployed ? 'deployed' : ''} ${!canAfford ? 'disabled' : ''}`}
+                onClick={() => handleAddAsset(type.id)}
+                disabled={!canDeploy}
+              >
+                <span className="icon">{type.icon}</span>
+                <div className="info">
+                  <span className="name">{type.name}</span>
+                  <span className="cost">
+                    {isDeployed ? '✓ Deployed' : `$${type.cost}M`}
+                  </span>
+                </div>
+                <div className="stats">
+                  <span>⚡ {type.speed}kn</span>
+                  <span>👁️ {type.detectionRange}nm</span>
+                  <span>❄️ {Math.round(type.iceCapability * 100)}%</span>
+                </div>
+              </motion.button>
+            );
+          })}
         </div>
       </div>
 
