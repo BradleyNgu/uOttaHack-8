@@ -61,6 +61,20 @@ const getEdgeKey = (from, to) => {
   return from < to ? `${from}-${to}` : `${to}-${from}`;
 };
 
+// Calculate fuel cost multiplier based on weather
+const getFuelCostMultiplier = (weatherType) => {
+  // Blizzard and storm double the fuel cost (1.0 = normal, 2.0 = double)
+  if (weatherType === 'blizzard' || weatherType === 'storm') {
+    return 2.0;
+  }
+  // Fog increases cost by 50%
+  if (weatherType === 'fog') {
+    return 1.5;
+  }
+  // Clear weather has normal cost
+  return 1.0;
+};
+
 const initialState = {
   // Game state
   isRunning: false,
@@ -509,7 +523,8 @@ export const useGameStore = create((set, get) => ({
         let newProgress = asset.progress + distancePerTick;
         
         // Fuel consumption
-        const fuelUsed = asset.fuelConsumption * distancePerTick * edge.distance;
+        const weatherCostMultiplier = getFuelCostMultiplier(state.weather[nextNode]);
+        const fuelUsed = asset.fuelConsumption * distancePerTick * edge.distance * weatherCostMultiplier;
         const newFuel = Math.max(0, asset.currentFuel - fuelUsed);
         
         // Track fuel consumed for budget deduction

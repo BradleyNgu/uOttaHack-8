@@ -193,7 +193,7 @@ export const ASSET_TYPES = {
     icon: '🛥️',
     maxFuel: 30000,
     fuelConsumption: 60,
-    speed: 25,
+    speed: 35,
     detectionRange: 40,
     iceCapability: 0.4,
     payload: 200,
@@ -205,11 +205,24 @@ export const ASSET_TYPES = {
     icon: '🤖',
     maxFuel: 5000,
     fuelConsumption: 10,
-    speed: 20,
+    speed: 30,
     detectionRange: 10,
     iceCapability: 0.2,
     payload: 50,
     cost: 20,
+  },
+  icebreaker: {
+    id: 'icebreaker',
+    name: 'Icebreaker',
+    icon: '🧊',
+    maxFuel: 80000,
+    fuelConsumption: 100,
+    speed: 20,
+    detectionRange: 35,
+    iceCapability: 1.0, // can break through any ice
+    payload: 150,
+    cost: 120,
+    clearsIce: true, // special ability
   },
   aircraft: {
     id: 'aircraft',
@@ -221,7 +234,7 @@ export const ASSET_TYPES = {
     detectionRange: 150,
     iceCapability: 1.0, // flies over ice
     payload: 100,
-    cost: 80,
+    cost: 100,
   },
   longDistance: {
     id: 'longDistance',
@@ -234,19 +247,6 @@ export const ASSET_TYPES = {
     iceCapability: 0.9, 
     payload: 300,
     cost: 150,
-  },
-  icebreaker: {
-    id: 'icebreaker',
-    name: 'Icebreaker',
-    icon: '🧊',
-    maxFuel: 80000,
-    fuelConsumption: 100,
-    speed: 12,
-    detectionRange: 35,
-    iceCapability: 1.0, // can break through any ice
-    payload: 150,
-    cost: 120,
-    clearsIce: true, // special ability
   },
 };
 
@@ -266,37 +266,37 @@ export const THREAT_TYPES = {
 };
 
 // Initial scenarios
-export const SCENARIOS = {
-  lowThreat: {
-    id: 'lowThreat',
-    name: 'Low Threat',
-    description: 'Routine patrol operations with minimal threats',
-    threatFrequency: 0.1,
-    weatherSeverity: 0.3,
-    initialBudget: 500,
-  },
-  mediumThreat: {
-    id: 'mediumThreat',
-    name: 'Medium Threat',
-    description: 'Increased maritime traffic and moderate threats',
-    threatFrequency: 0.3,
-    weatherSeverity: 0.5,
-    initialBudget: 400,
-  },
-  highThreat: {
-    id: 'highThreat',
-    name: 'High Threat',
-    description: 'Significant foreign activity and severe weather',
-    threatFrequency: 0.5,
-    weatherSeverity: 0.7,
-    initialBudget: 350,
-  },
-  crisis: {
-    id: 'crisis',
-    name: 'Crisis Mode',
-    description: 'Multiple simultaneous threats requiring rapid response',
-    threatFrequency: 0.7,
-    weatherSeverity: 0.8,
-    initialBudget: 300,
-  },
-};
+// export const SCENARIOS = {
+//   lowThreat: {
+//     id: 'lowThreat',
+//     name: 'Low Threat',
+//     description: 'Routine patrol operations with minimal threats',
+//     threatFrequency: 0.1,
+//     weatherSeverity: 0.3,
+//     initialBudget: 500,
+//   },
+//   mediumThreat: {
+//     id: 'mediumThreat',
+//     name: 'Medium Threat',
+//     description: 'Increased maritime traffic and moderate threats',
+//     threatFrequency: 0.3,
+//     weatherSeverity: 0.5,
+//     initialBudget: 400,
+//   },
+//   highThreat: {
+//     id: 'highThreat',
+//     name: 'High Threat',
+//     description: 'Significant foreign activity and severe weather',
+//     threatFrequency: 0.5,
+//     weatherSeverity: 0.7,
+//     initialBudget: 350,
+//   },
+//   crisis: {
+//     id: 'crisis',
+//     name: 'Crisis Mode',
+//     description: 'Multiple simultaneous threats requiring rapid response',
+//     threatFrequency: 0.7,
+//     weatherSeverity: 0.8,
+//     initialBudget: 300,
+//   },
+// };
