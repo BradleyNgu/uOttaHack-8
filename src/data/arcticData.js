@@ -182,10 +182,10 @@ export const ASSET_TYPES = {
     maxFuel: 50000,
     fuelConsumption: 80,
     speed: 20,
-    detectionRange: 30,
+    detectionRange: 10,
     iceCapability: 0.3,
     payload: 800,
-    cost: 60,
+    cost: 70,
   },
   patrol: {
     id: 'patrol',
@@ -197,7 +197,7 @@ export const ASSET_TYPES = {
     detectionRange: 150,
     iceCapability: 0.4,
     payload: 200,
-    cost: 50,
+    cost: 60,
   },
   mining: {
     id: 'mining',
@@ -206,10 +206,10 @@ export const ASSET_TYPES = {
     maxFuel: 8000,
     fuelConsumption: 10,
     speed: 30,
-    detectionRange: 100,
+    detectionRange: 10,
     iceCapability: 0.2,
     payload: 50,
-    cost: 20,
+    cost: 40,
   },
   icebreaker: {
     id: 'icebreaker',
@@ -234,7 +234,7 @@ export const ASSET_TYPES = {
     detectionRange: 300,
     iceCapability: 1.0, // flies over ice
     payload: 100,
-    cost: 100,
+    cost: 120,
   },
   longDistance: {
     id: 'longDistance',
