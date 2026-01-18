@@ -20,9 +20,12 @@
   },
   "homepage": "https://github.com/BradleyNgu/uOttaHack-8#readme",
   "dependencies": {
+    "framer-motion": "^12.26.2",
+    "lucide-react": "^0.562.0",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
-    "vite": "^7.3.1"
+    "vite": "^7.3.1",
+    "zustand": "^5.0.10"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^5.1.2"
