@@ -103,7 +103,7 @@
 int tempo = 108;
 
 // change this to whichever pin you want to use
-int buzzer = 11;
+int buzzer = 7;
 
 // notes of the moledy followed by the duration.
 // a 4 means a quarter note, 8 an eighteenth , 16 sixteenth, so on
@@ -150,31 +150,42 @@ int wholenote = (60000 * 4) / tempo;
 
 int divider = 0, noteDuration = 0;
 
-//Pins
+//-----------------------------------------------------------------------Pins controls
+//RED --> stop
 int buttPinR = 2;
+//Green --> start
 int buttPinG = 3;
+//Blue --> Reset
 int buttPinB = 4;
 
 int redPin = 9;
 int greenPin = 11; 
 int bluePin = 10;  
+int yellowPin = 12; 
 
 // Button Variables
 int buttValR = 1, buttValOldR = 1;
 int buttValG = 1, buttValOldG = 1;
 int buttValB = 1, buttValOldB = 1;
 
-//JOYSTICK
+//----------------------------------- select
 
-// Define the pins used for the joystick
-int X_pin = A0;   // VRx pin connected to Analog 0
-int Y_pin = A1;   // VRy pin connected to Analog 1
-int button_pin = 2; // SW pin connected to Digital 2
+int buttPinYellowCivilian = 8;
+int buttPinRedPatrol   = 9;
+int buttPinGreenMine  = 10;
+int buttPinRedAir   = 11;
+int buttPinWhiteSupport  = 12;
+int buttPinBlueIcebreaker   = 13;
 
-// Variables to store the values
-int x_val;
-int y_val;
-int button_state;
+// --- VARIABLES ---
+// Current State
+int buttValYellowCiv = 1, buttValRedPatrol = 1, buttValGreenMine = 1;
+int buttValRedAir = 1,   buttValWhiteSupport = 1, buttValBlueIce = 1;
+
+// Old State (for tracking presses)
+int buttOldYellowCiv = 1, buttOldRedPatrol = 1, buttOldGreenMine = 1;
+int buttOldRedAir = 1,   buttOldWhiteSupport = 1, buttOldBlueIce = 1;
+
 
 void setup() {
   Serial.begin(115200);
@@ -205,82 +216,131 @@ void setup() {
     noTone(buzzer);
   }
 
-  // Initialize Pins
-  pinMode(redPin, OUTPUT);
-  pinMode(greenPin, OUTPUT);
-  pinMode(bluePin, OUTPUT);
+  // Button Pins Game modes
   
   pinMode(buttPinR, INPUT_PULLUP);
   pinMode(buttPinG, INPUT_PULLUP);
   pinMode(buttPinB, INPUT_PULLUP);
 
-  //JOYSTICK
-
-  Serial.begin(9600); // Initialize Serial Monitor to view output
-
-  // Set up the pins as inputs
-  pinMode(X_pin, INPUT);
-  pinMode(Y_pin, INPUT);
-  
-  // The button uses the internal pull-up resistor (no extra resistor needed)
-  pinMode(button_pin, INPUT_PULLUP); 
+  // Button Pins SELECT
+  // Initialize Button Pins
+  pinMode(buttPinYellowCivilian, INPUT_PULLUP);
+  pinMode(buttPinRedPatrol, INPUT_PULLUP);
+  pinMode(buttPinGreenMine, INPUT_PULLUP);
+  pinMode(buttPinRedAir, INPUT_PULLUP);
+  pinMode(buttPinWhiteSupport, INPUT_PULLUP);
+  pinMode(buttPinBlueIcebreaker, INPUT_PULLUP);
 
 }
 
 void loop() {
-  // 1. Read Buttons
+  //GAME MODES
   buttValR = digitalRead(buttPinR);
   buttValG = digitalRead(buttPinG);
   buttValB = digitalRead(buttPinB);
-  buttValY = digitalRead(buttPinY);
 
   // ---------------- RED BUTTON ----------------
   if (buttValR == 0 && buttValOldR == 1) {
-    digitalWrite(redPin, HIGH); 
-    digitalWrite(greenPin, LOW); 
-    digitalWrite(bluePin, LOW);
-    digitalWrite(yellowPin, LOW);
+    //DO SOMETHING --> Stop
   }
 
   // ---------------- GREEN BUTTON ----------------
   if (buttValG == 0 && buttValOldG == 1) {
-    digitalWrite(redPin, LOW);
-    digitalWrite(greenPin, HIGH);
-    digitalWrite(bluePin, LOW);
-    digitalWrite(yellowPin, LOW);
+    //DO SOMETHING --> Start
   }
 
   // ---------------- BLUE BUTTON ----------------
   if (buttValB == 0 && buttValOldB == 1) {
-    digitalWrite(redPin, LOW);
-    digitalWrite(greenPin, LOW);
-    digitalWrite(bluePin, HIGH);
-    digitalWrite(yellowPin, LOW);
+    //do something --> reset
   }
-
 
   buttValOldR = buttValR;
   buttValOldG = buttValG;
   buttValOldB = buttValB;
-  buttValOldY = buttValY;
 
-  //JOYSTICK
+   // 1. Read All Buttons
+  buttValYellowCiv = digitalRead(buttPinYellowCivilian);
+  buttValRedPatrol   = digitalRead(buttPinRedPatrol);
+  buttValGreenMine  = digitalRead(buttPinGreenMine);
+  buttValRedAir   = digitalRead(buttPinRedAir);
+  buttValWhiteSupport  = digitalRead(buttPinWhiteSupport);
+  buttValBlueIce   = digitalRead(buttPinBlueIcebreaker);
 
-  // Read the analog values from X and Y axis
-  x_val = analogRead(X_pin);
-  y_val = analogRead(Y_pin);
-  
-  // Read the digital value from the button (0 = pressed, 1 = not pressed)
-  button_state = digitalRead(button_pin);
 
-  // Print the values to the Serial Monitor in a readable format
-  Serial.print("X: ");
-  Serial.print(x_val);
-  Serial.print(" | Y: ");
-  Serial.print(y_val);
-  Serial.print(" | Button: ");
-  Serial.println(button_state); // println creates a new line after the button state
-  
+  // ---------------- YELLOW BUTTON CIV (Pin 2 -> LED 8) ----------------
+  if (buttValYellowCiv == 0 && buttOldYellowCiv == 1) {
+    digitalWrite(ledPinYellowCivilian, HIGH);
+    digitalWrite(ledPinRedPatrol, LOW);
+    digitalWrite(ledPinGreenMine, LOW);
+    digitalWrite(ledPinRedAir, LOW);
+    digitalWrite(ledPinWhiteSupport, LOW);
+    digitalWrite(ledPinBlueIcebreaker, LOW);
+    Serial.println("Yellow Pressed");
+  }
+
+  // ---------------- RED PATROL BUTTON (Pin 3 -> LED 9) ----------------
+  if (buttValRedPatrol == 0 && buttOldRedPatrol == 1) {
+    digitalWrite(ledPinYellowCivilian, LOW);
+    digitalWrite(ledPinRedPatrol, HIGH);
+    digitalWrite(ledPinGreenMine, LOW);
+    digitalWrite(ledPinRedAir, LOW);
+    digitalWrite(ledPinWhiteSupport, LOW);
+    digitalWrite(ledPinBlueIcebreaker, LOW);
+    Serial.println("Red 1 Pressed");
+  }
+
+  // ---------------- GREEN BUTTON MINING (Pin 4 -> LED 10) ----------------
+  if (buttValGreenMine == 0 && buttOldGreenMine == 1) {
+    digitalWrite(ledPinYellowCivilian, LOW);
+    digitalWrite(ledPinRedPatrol, LOW);
+    digitalWrite(ledPinGreenMine, HIGH);
+    digitalWrite(ledPinRedAir, LOW);
+    digitalWrite(ledPinWhiteSupport, LOW);
+    digitalWrite(ledPinBlueIcebreaker, LOW);
+    Serial.println("Green Pressed");
+  }
+
+  // ---------------- RED BUTTON AIR(Pin 5 -> LED 11) ----------------
+  if (buttValRedAir == 0 && buttOldRedAir == 1) {
+    digitalWrite(ledPinYellowCivilian, LOW);
+    digitalWrite(ledPinRedPatrol, LOW);
+    digitalWrite(ledPinGreenMine, LOW);
+    digitalWrite(ledPinRedAir, HIGH);
+    digitalWrite(ledPinWhiteSupport, LOW);
+    digitalWrite(ledPinBlueIcebreaker, LOW);
+    Serial.println("Red 2 Pressed");
+  }
+
+  // ---------------- WHITE BUTTON (Pin 6 -> LED 12) ----------------
+  if (buttValWhiteSupport == 0 && buttOldWhiteSupport == 1) {
+    digitalWrite(ledPinYellowCivilian, LOW);
+    digitalWrite(ledPinRedPatrol, LOW);
+    digitalWrite(ledPinGreenMine, LOW);
+    digitalWrite(ledPinRedAir, LOW);
+    digitalWrite(ledPinWhiteSupport, HIGH);
+    digitalWrite(ledPinBlueIcebreaker, LOW);
+    Serial.println("White Pressed");
+  }
+
+  // ---------------- BLUE BUTTON IceBreaker (Pin 7 -> LED 13) ----------------
+  if (buttValBlueIce == 0 && buttOldBlueIce == 1) {
+    digitalWrite(ledPinYellowCivilian, LOW);
+    digitalWrite(ledPinRedPatrol, LOW);
+    digitalWrite(ledPinGreenMine, LOW);
+    digitalWrite(ledPinRedAir, LOW);
+    digitalWrite(ledPinWhiteSupport, LOW);
+    digitalWrite(ledPinBlueIcebreaker, HIGH);
+    Serial.println("Blue Pressed");
+  }
+
+  // Update Old Values
+  buttOldYellowCiv = buttValYellowCiv;
+  buttOldRedPatrol   = buttValRedPatrol;
+  buttOldGreenMine  = buttValGreenMine;
+  buttOldRedAir   = buttValRedAir;
+  buttOldWhiteSupport  = buttValWhiteSupport;
+  buttOldBlueIce  = buttValBlueIce;
+
   delay(10); 
 }
 
