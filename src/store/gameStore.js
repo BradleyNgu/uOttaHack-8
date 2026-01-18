@@ -296,6 +296,10 @@ export const useGameStore = create((set, get) => ({
     
     if (!asset || !threat) return;
     
+    // Only combat-capable assets can intercept threats (not civilian ships or mining vessels)
+    const combatAssetTypes = ['patrol', 'aircraft', 'icebreaker', 'longDistance'];
+    if (!combatAssetTypes.includes(asset.typeId)) return;
+    
     const path = findPath(asset.position, threat.position);
     if (!path) return;
     
@@ -659,14 +663,17 @@ export const useGameStore = create((set, get) => ({
       }
       
       // Check if an asset is at threat location to neutralize
+      // Only combat-capable assets can neutralize threats (not civilian ships or mining vessels)
+      const combatAssetTypes = ['patrol', 'aircraft', 'icebreaker', 'longDistance'];
+      
       for (const asset of updatedAssets) {
-        if (asset.position === threat.position) {
+        if (asset.position === threat.position && combatAssetTypes.includes(asset.typeId)) {
           // Asset at threat location - neutralize it!
           if (asset.status === 'intercepting' && asset.interceptingThreat === threat.id) {
             threatsToRemove.push(threat.id);
             return { ...threat, neutralized: true };
           }
-          // Any asset at location can neutralize detected threats
+          // Any combat asset at location can neutralize detected threats
           if (threat.detected) {
             threatsToRemove.push(threat.id);
             return { ...threat, neutralized: true };
