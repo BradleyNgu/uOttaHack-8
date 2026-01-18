@@ -524,11 +524,15 @@ body {
 
 .threat-marker {
   cursor: pointer;
-  transition: transform 0.2s ease;
+  transition: filter 0.2s ease;
 }
 
 .threat-marker:hover {
-  transform: scale(1.1);
+  filter: brightness(1.2) drop-shadow(0 0 12px currentColor);
+}
+
+.threat-marker:hover .threat-pulse {
+  animation-duration: 0.5s;
 }
 
 /* Map Tooltip */
