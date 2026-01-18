@@ -804,7 +804,7 @@ export default function ArcticMap() {
                       ? '✅ Any ship can pass through!'
                       : icePercent >= 50 
                       ? '⚠️ Icebreaker recommended'
-                      : icePercent >= 30
+                      : icePercent >= 40
                       ? '⚠️ Patrol vessels may have difficulty'
                       : '✓ Safe for most vessels'}
                   </p>
