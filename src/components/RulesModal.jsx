@@ -38,7 +38,7 @@ export default function RulesModal({ isOpen, onClose }) {
               {/* Objective */}
               <section className="rules-section">
                 <h3>Objective</h3>
-                <p>Manage your Arctic patrol operations efficiently while protecting trade routes, extracting resources, and neutralizing threats. Keep your budget above $0 to avoid mission failure.</p>
+                <p>Manage your Arctic patrol operations efficiently while protecting trade routes, extracting resources, and neutralizing threats. When your budget reaches $0 you will lose the game.</p>
               </section>
 
               {/* Assets */}
@@ -87,6 +87,7 @@ export default function RulesModal({ isOpen, onClose }) {
                   <li><strong>Neutralize:</strong> Send assets to threat location to neutralize</li>
                   <li><strong>Damage:</strong> Expired threats deduct budget</li>
                   <li><strong>Detection:</strong> Assets near threats can detect them</li>
+                  <li><strong>Emgerence:</strong> Threats can only appear on the patrol points</li>
                 </ul>
               </section>
 

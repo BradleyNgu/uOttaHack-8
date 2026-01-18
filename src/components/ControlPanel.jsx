@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Pause, Square, RotateCcw, Settings, HelpCircle, ChevronDown, ChevronUp } from 'lucide-react';
+import { Play, Pause, Square, RotateCcw, Settings, HelpCircle, ChevronDown, ChevronUp, Usb } from 'lucide-react';
 import { useGameStore } from '../store/gameStore';
 import { WEATHER_CONDITIONS } from '../data/arcticData';
+import { useArduino } from '../hooks/useArduino';
 
 export default function ControlPanel() {
   const [showInstructions, setShowInstructions] = useState(true);
@@ -26,6 +27,8 @@ export default function ControlPanel() {
     setGameSpeed,
     updateSettings,
   } = useGameStore();
+  
+  const { isConnected, connectionStatus, connect, disconnect } = useArduino();
 
   const formatTime = (hours) => {
     const h = Math.floor(hours);
@@ -77,9 +80,7 @@ export default function ControlPanel() {
                 <span className="step-num">5</span>
                 <span>Intercept <strong>⚠️ threats</strong> before they expire!</span>
               </div>
-              <div className="instruction-tip">
-                💡 <strong>Tip:</strong> Threats cost budget if not neutralized in time. Move assets to threat locations to neutralize them.
-              </div>
+
             </motion.div>
           )}
         </AnimatePresence>
@@ -95,6 +96,27 @@ export default function ControlPanel() {
         <span className="value">${Math.round(budget)}M</span>
         {threatDamage > 0 && (
           <span className="damage">-${Math.round(threatDamage)}M lost</span>
+        )}
+      </div>
+
+      {/* Arduino Connection */}
+      <div className="arduino-connection">
+        <button
+          className={`arduino-btn ${isConnected ? 'connected' : ''}`}
+          onClick={isConnected ? disconnect : connect}
+          title={isConnected ? 'Disconnect Arduino' : 'Connect Arduino Controller'}
+        >
+          <Usb size={14} />
+          <span>{isConnected ? 'DISCONNECT' : 'CONNECT'}</span>
+        </button>
+        {isConnected && (
+          <span className="arduino-status" style={{ 
+            fontSize: '0.7rem', 
+            color: '#00ff88',
+            marginTop: '0.25rem'
+          }}>
+            ● {connectionStatus}
+          </span>
         )}
       </div>
 
