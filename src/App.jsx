@@ -7,6 +7,7 @@ import Dashboard from './components/Dashboard';
 import GameOver from './components/GameOver';
 import { useGameStore } from './store/gameStore';
 import './App.css';
+import logoImage from './assets/logo.png';
 
 function App() {
   const { tick, isRunning, isPaused, gameSpeed, updateWeather, spawnThreat, currentDay } = useGameStore();
@@ -52,7 +53,7 @@ function App() {
         animate={{ opacity: 1, y: 0 }}
       >
         <div className="logo">
-          <span className="icon">🛡️</span>
+          <span className="icon"><img src={logoImage} alt="Arctic Argus Logo" /></span>
           <div className="title">
             <h1>ARCTIC ARGUS</h1>
             <span className="subtitle">Canadian Arctic Patrol Simulator</span>
