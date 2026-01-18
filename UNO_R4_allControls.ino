@@ -103,7 +103,7 @@
 int tempo = 108;
 
 // change this to whichever pin you want to use
-int buzzer = 8;
+int buzzer = 11;
 
 // notes of the moledy followed by the duration.
 // a 4 means a quarter note, 8 an eighteenth , 16 sixteenth, so on
@@ -154,18 +154,15 @@ int divider = 0, noteDuration = 0;
 int buttPinR = 2;
 int buttPinG = 3;
 int buttPinB = 4;
-int buttPinY = 5;
 
 int redPin = 9;
 int greenPin = 11; 
 int bluePin = 10;  
-int yellowPin = 12; 
 
 // Button Variables
 int buttValR = 1, buttValOldR = 1;
 int buttValG = 1, buttValOldG = 1;
 int buttValB = 1, buttValOldB = 1;
-int buttValY = 1, buttValOldY = 1;
 
 //JOYSTICK
 
@@ -212,12 +209,10 @@ void setup() {
   pinMode(redPin, OUTPUT);
   pinMode(greenPin, OUTPUT);
   pinMode(bluePin, OUTPUT);
-  pinMode(yellowPin, OUTPUT);
   
   pinMode(buttPinR, INPUT_PULLUP);
   pinMode(buttPinG, INPUT_PULLUP);
   pinMode(buttPinB, INPUT_PULLUP);
-  pinMode(buttPinY, INPUT_PULLUP);
 
   //JOYSTICK
 
@@ -263,14 +258,6 @@ void loop() {
     digitalWrite(yellowPin, LOW);
   }
 
-  // ---------------- YELLOW BUTTON ----------------
-  if (buttValY == 0 && buttValOldY == 1) {
-    digitalWrite(redPin, LOW);
-    digitalWrite(greenPin, LOW);
-    digitalWrite(bluePin, LOW);
-    digitalWrite(yellowPin, HIGH);
-
-  }
 
   buttValOldR = buttValR;
   buttValOldG = buttValG;
