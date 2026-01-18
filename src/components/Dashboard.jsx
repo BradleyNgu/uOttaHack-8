@@ -193,9 +193,6 @@ export default function Dashboard() {
                   <span className="icon">{threat.type.icon}</span>
                   <div className="info">
                     <span className="type">{threat.type.name}</span>
-                    <span className="location">
-                      <MapPin size={10} /> {NODES[threat.position]?.name}
-                    </span>
                   </div>
                   <div className="threat-meta">
                     {!threat.neutralized && threat.detected && (
