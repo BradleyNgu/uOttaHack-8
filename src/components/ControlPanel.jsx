@@ -77,9 +77,7 @@ export default function ControlPanel() {
                 <span className="step-num">5</span>
                 <span>Intercept <strong>⚠️ threats</strong> before they expire!</span>
               </div>
-              <div className="instruction-tip">
-                💡 <strong>Tip:</strong> Threats cost budget if not neutralized in time. Move assets to threat locations to neutralize them.
-              </div>
+
             </motion.div>
           )}
         </AnimatePresence>
