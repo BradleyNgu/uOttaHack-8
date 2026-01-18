@@ -194,7 +194,7 @@ export default function Dashboard() {
                   <div className="info">
                     <span className="type">{threat.type.name}</span>
                     <span className="location">
-                      <MapPin size={10} /> {NODES[threat.position]?.name}
+                      📍 <strong>{NODES[threat.position]?.name || 'Unknown Location'}</strong>
                     </span>
                   </div>
                   <div className="threat-meta">

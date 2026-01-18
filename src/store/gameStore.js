@@ -43,7 +43,7 @@ const DEFAULT_SETTINGS = {
   movementCostEnabled: false, // movement is FREE by default, only refueling costs
   threatDamageEnabled: true,
   // Mining settings
-  baseMiningCost: 0.01, // base cost per mining tick in millions
+  baseMiningCost: 0.05, // base cost per mining tick in millions (increased from 0.01)
   inflationRate: 0.05, // 5% increase per week
   inflationIntervalDays: 3, // days before inflation kicks in (1 week)
 };
