@@ -43,7 +43,7 @@ export default function RulesModal({ isOpen, onClose }) {
 
               {/* Assets */}
               <section className="rules-section">
-                <h3><Ship size={18} /> Assets & Deployment</h3>
+                <h3>Assets & Deployment</h3>
                 <ul>
                   <li><strong>Deploy Assets:</strong> Click a port (cyan node), then deploy from Fleet Command panel</li>
                   <li><strong>One per Type:</strong> Only one of each asset type can be deployed</li>
@@ -76,7 +76,7 @@ export default function RulesModal({ isOpen, onClose }) {
 
               {/* Threats */}
               <section className="rules-section">
-                <h3><AlertTriangle size={18} /> Threats</h3>
+                <h3>Threats</h3>
                 <ul>
                   <li><strong>Auto-Pause:</strong> Game pauses when threats spawn</li>
                   <li><strong>Time Limit:</strong> Each threat has a time limit before causing damage</li>
@@ -88,7 +88,7 @@ export default function RulesModal({ isOpen, onClose }) {
 
               {/* Resources */}
               <section className="rules-section">
-                <h3><Pickaxe size={18} /> Mining & Resources</h3>
+                <h3>Mining & Resources</h3>
                 <ul>
                   <li><strong>Capacity Limits:</strong> Oil (50K), Gas (30K), Minerals (20K)</li>
                   <li><strong>Mining Costs:</strong> Base cost + inflation (5% per week)</li>
@@ -99,7 +99,7 @@ export default function RulesModal({ isOpen, onClose }) {
 
               {/* Trade Routes */}
               <section className="rules-section">
-                <h3><MapPin size={18} /> Trade Routes</h3>
+                <h3>Trade Routes</h3>
                 <ul>
                   <li><strong>Goal:</strong> Visit all 4 ports with Civilian Cargo Ship</li>
                   <li><strong>Ports:</strong> Tuktoyaktuk, Resolute Bay, Iqaluit, Churchill</li>
@@ -121,7 +121,7 @@ export default function RulesModal({ isOpen, onClose }) {
 
               {/* Budget & Costs */}
               <section className="rules-section">
-                <h3><DollarSign size={18} /> Budget & Costs</h3>
+                <h3>Budget & Costs</h3>
                 <ul>
                   <li><strong>Deployment:</strong> One-time cost when deploying assets</li>
                   <li><strong>Movement:</strong> FREE (but consumes fuel)</li>
@@ -148,11 +148,11 @@ export default function RulesModal({ isOpen, onClose }) {
               <section className="rules-section">
                 <h3>Weather</h3>
                 <ul>
-                  <li>Extreme weather breaks out in different regions every day</li>
-                  <li>Weather causes an increase in fuel consumption when entering</li>
-                  <li>Blizzards and Storms double consumption</li>
-                  <li>Fog increases consumption by 50%</li>
-                  <li>Plan routes accordingly to avoid extreme weather</li>
+                  <li><strong>Extreme Weather:</strong> Breaks out in different regions every day</li>
+                  <li><strong>Effects:</strong> Causes an increase in fuel consumption when entering</li>
+                  <li><strong>Blizzards and Storms:</strong> Double consumption</li>
+                  <li><strong>Fog:</strong> Increases consumption by 50%</li>
+                  <li><strong>Plan:</strong> Avoid extreme weather</li>
                 </ul>
               </section>
 
