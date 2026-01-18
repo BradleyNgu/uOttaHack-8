@@ -505,12 +505,30 @@ body {
 }
 
 .threat-pulse {
-  animation: threat-pulse 0.5s infinite alternate;
+  animation: threat-pulse 1s ease-in-out infinite;
+  filter: drop-shadow(0 0 8px currentColor);
 }
 
 @keyframes threat-pulse {
-  0% { stroke-width: 2; opacity: 0.5; }
-  100% { stroke-width: 4; opacity: 1; }
+  0%, 100% { 
+    stroke-width: 3; 
+    opacity: 0.8; 
+    r: 25;
+  }
+  50% { 
+    stroke-width: 4; 
+    opacity: 1; 
+    r: 28;
+  }
+}
+
+.threat-marker {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.threat-marker:hover {
+  transform: scale(1.1);
 }
 
 /* Map Tooltip */

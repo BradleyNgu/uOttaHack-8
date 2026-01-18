@@ -32,14 +32,31 @@ export default function ArcticMap() {
     weather,
     threats,
     isRunning,
+    isPaused,
     currentIceRisk,
     clearedIce,
     currentDay,
+    currentTime,
   } = useGameStore();
   
   // Helper to get edge key (same as in gameStore)
   const getEdgeKey = (from, to) => {
     return from < to ? `${from}-${to}` : `${to}-${from}`;
+  };
+  
+  // Check if any assets are moving
+  const anyAssetsMoving = assets.some(
+    (asset) => asset.status === 'moving' || asset.status === 'patrolling' || asset.status === 'intercepting'
+  );
+  
+  // Show all threats when vehicles are not moving (paused or all idle)
+  const showAllThreats = isPaused || !anyAssetsMoving;
+  
+  // Calculate threat time remaining for display
+  const currentTotalTime = currentTime + (currentDay - 1) * 24;
+  const getThreatTimeRemaining = (threat) => {
+    const elapsed = currentTotalTime - threat.spawnTime;
+    return Math.max(0, threat.timeLimit - elapsed);
   };
 
   // Convert screen coordinates to SVG viewBox coordinates
@@ -417,30 +434,74 @@ export default function ArcticMap() {
 
         {/* Threats */}
         {threats
-          .filter((t) => t.detected)
+          .filter((t) => !t.neutralized && (showAllThreats || t.detected))
           .map((threat) => {
             const node = NODES[threat.position];
             if (!node) return null;
+            
+            const timeRemaining = getThreatTimeRemaining(threat);
+            const isUrgent = timeRemaining < 3;
+            const isDetected = threat.detected;
+            const threatColor = isUrgent ? '#ff3b3b' : isDetected ? '#ff9f43' : '#ff6b6b';
+            const threatOpacity = isDetected ? 1 : 0.7;
 
             return (
-              <g key={threat.id}>
+              <g key={threat.id} className="threat-marker">
+                {/* Pulsing alert ring */}
                 <circle
                   cx={node.x}
                   cy={node.y}
-                  r="25"
+                  r={isUrgent ? "30" : "25"}
                   fill="none"
-                  stroke="#ff0000"
-                  strokeWidth="3"
+                  stroke={threatColor}
+                  strokeWidth={isUrgent ? "4" : "3"}
+                  opacity={threatOpacity}
                   className="threat-pulse"
                 />
+                {/* Background circle for better visibility */}
+                <circle
+                  cx={node.x}
+                  cy={node.y}
+                  r="18"
+                  fill={threatColor}
+                  opacity={isDetected ? 0.2 : 0.15}
+                />
+                {/* Threat icon */}
                 <text
                   x={node.x}
-                  y={node.y + 5}
+                  y={node.y + 6}
                   textAnchor="middle"
-                  fontSize="20"
+                  fontSize={isUrgent ? "22" : "20"}
+                  opacity={threatOpacity}
                 >
                   {threat.type.icon}
                 </text>
+                {/* Time remaining label (when paused or not moving) */}
+                {showAllThreats && !isDetected && (
+                  <text
+                    x={node.x}
+                    y={node.y + 35}
+                    textAnchor="middle"
+                    fontSize="10"
+                    fill={threatColor}
+                    fontWeight="bold"
+                    opacity={0.9}
+                  >
+                    {timeRemaining.toFixed(1)}h
+                  </text>
+                )}
+                {/* Detected indicator */}
+                {isDetected && (
+                  <text
+                    x={node.x + 15}
+                    y={node.y - 15}
+                    fontSize="12"
+                    fill="#00ff88"
+                    fontWeight="bold"
+                  >
+                    👁️
+                  </text>
+                )}
               </g>
             );
           })}
