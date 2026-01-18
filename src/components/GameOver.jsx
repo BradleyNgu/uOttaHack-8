@@ -93,7 +93,7 @@ export default function GameOver() {
         {/* Header */}
         <div className="game-over-header">
           <Skull className="skull-icon" size={48} />
-          <h1>MISSION FAILED</h1>
+          <h1>SIMULATION ENDED</h1>
           <p className="subtitle">Budget Depleted - Operations Ceased</p>
         </div>
 
