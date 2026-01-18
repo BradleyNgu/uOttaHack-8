@@ -190,6 +190,26 @@ int buttOldRedAir = 1,   buttOldWhiteSupport = 1, buttOldBlueIce = 1;
 void setup() {
   Serial.begin(115200);
 
+
+  // Button Pins Game modes
+  
+  pinMode(buttPinR, INPUT_PULLUP);
+  pinMode(buttPinG, INPUT_PULLUP);
+  pinMode(buttPinB, INPUT_PULLUP);
+
+  // Button Pins SELECT
+  // Initialize Button Pins
+  pinMode(buttPinYellowCivilian, INPUT_PULLUP);
+  pinMode(buttPinRedPatrol, INPUT_PULLUP);
+  pinMode(buttPinGreenMine, INPUT_PULLUP);
+  pinMode(buttPinRedAir, INPUT_PULLUP);
+  pinMode(buttPinWhiteSupport, INPUT_PULLUP);
+  pinMode(buttPinBlueIcebreaker, INPUT_PULLUP);
+
+}
+
+void loop() {
+  
   //MUSIC
     // iterate over the notes of the melody. 
   // Remember, the array is twice the number of notes (notes + durations)
@@ -215,25 +235,6 @@ void setup() {
     // stop the waveform generation before the next note.
     noTone(buzzer);
   }
-
-  // Button Pins Game modes
-  
-  pinMode(buttPinR, INPUT_PULLUP);
-  pinMode(buttPinG, INPUT_PULLUP);
-  pinMode(buttPinB, INPUT_PULLUP);
-
-  // Button Pins SELECT
-  // Initialize Button Pins
-  pinMode(buttPinYellowCivilian, INPUT_PULLUP);
-  pinMode(buttPinRedPatrol, INPUT_PULLUP);
-  pinMode(buttPinGreenMine, INPUT_PULLUP);
-  pinMode(buttPinRedAir, INPUT_PULLUP);
-  pinMode(buttPinWhiteSupport, INPUT_PULLUP);
-  pinMode(buttPinBlueIcebreaker, INPUT_PULLUP);
-
-}
-
-void loop() {
   //GAME MODES
   buttValR = digitalRead(buttPinR);
   buttValG = digitalRead(buttPinG);
@@ -311,6 +312,6 @@ void loop() {
   buttOldWhiteSupport  = buttValWhiteSupport;
   buttOldBlueIce  = buttValBlueIce;
 
-  delay(100); 
+  delay(10); 
 }
 
