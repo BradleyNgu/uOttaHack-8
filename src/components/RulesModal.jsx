@@ -150,9 +150,8 @@ export default function RulesModal({ isOpen, onClose }) {
                 <ul>
                   <li><strong>Extreme Weather:</strong> Breaks out in different regions every day</li>
                   <li><strong>Effects:</strong> Causes an increase in fuel consumption when entering</li>
-                  <li><strong>Blizzards and Storms:</strong> Double consumption</li>
+                  <li><strong>Blizzards and Storms:</strong> Doubles consumption</li>
                   <li><strong>Fog:</strong> Increases consumption by 50%</li>
-                  <li><strong>Plan:</strong> Avoid extreme weather</li>
                 </ul>
               </section>
 
