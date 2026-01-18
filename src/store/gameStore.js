@@ -42,6 +42,17 @@ const DEFAULT_SETTINGS = {
   fuelCostPerUnit: 0.0005, // cost per fuel unit (in millions) - so 1000 fuel = $0.5M
   movementCostEnabled: false, // movement is FREE by default, only refueling costs
   threatDamageEnabled: true,
+  // Mining settings
+  baseMiningCost: 0.01, // base cost per mining tick in millions
+  inflationRate: 0.05, // 5% increase per week
+  inflationIntervalDays: 3, // days before inflation kicks in (1 week)
+};
+
+// Resource capacity limits
+const RESOURCE_CAPACITY = {
+  oil: 50000,
+  gas: 30000,
+  minerals: 20000,
 };
 
 // Get all ports for tracking
@@ -84,6 +95,10 @@ const initialState = {
     gas: 0,
     minerals: 0,
   },
+  resourceCapacity: RESOURCE_CAPACITY,
+  miningTimeElapsed: 0, // total seconds spent mining (for inflation)
+  miningCostMultiplier: 1.0, // current inflation multiplier
+  totalMiningCost: 0, // total spent on mining operations
   portsVisited: [], // array of port IDs visited by civilian ships
   allPorts: ALL_PORTS,
   
@@ -467,10 +482,17 @@ export const useGameStore = create((set, get) => ({
     // Track newly mined resources this tick
     let newResourcesMined = { oil: 0, gas: 0, minerals: 0 };
     let newPortsVisited = [...state.portsVisited];
+    let miningCostThisTick = 0;
+    let isMiningThisTick = false;
     
     // Track ice cleared this tick
     let newClearedIce = { ...state.clearedIce };
     let newIceRisk = { ...state.currentIceRisk };
+    
+    // Calculate current mining cost with inflation
+    // Inflation increases every week (7 days) based on game day
+    const inflationIntervals = Math.floor((newDay - 1) / state.settings.inflationIntervalDays);
+    const currentMiningCostMultiplier = Math.pow(1 + state.settings.inflationRate, inflationIntervals);
     
     const updatedAssets = state.assets.map((asset) => {
       if (asset.status === 'moving' || asset.status === 'patrolling' || asset.status === 'intercepting') {
@@ -541,8 +563,19 @@ export const useGameStore = create((set, get) => ({
           // Mining ship at resource node - mine resources!
           if (asset.typeId === 'mining' && arrivedNode?.type === 'resource') {
             const resourceType = arrivedNode.resourceType;
-            const production = arrivedNode.production || 1000;
-            newResourcesMined[resourceType] = (newResourcesMined[resourceType] || 0) + production;
+            const currentAmount = state.resourcesMined[resourceType] + (newResourcesMined[resourceType] || 0);
+            const capacity = RESOURCE_CAPACITY[resourceType];
+            
+            // Only mine if under capacity - stop mining and costs when full
+            if (currentAmount < capacity) {
+              const production = Math.min(arrivedNode.production || 1000, capacity - currentAmount);
+              if (production > 0) {
+                newResourcesMined[resourceType] = (newResourcesMined[resourceType] || 0) + production;
+                isMiningThisTick = true;
+                miningCostThisTick += state.settings.baseMiningCost * currentMiningCostMultiplier;
+              }
+            }
+            // If at capacity, do nothing - no mining, no cost
           }
           
           // Civilian ship at port - track the visit!
@@ -569,8 +602,20 @@ export const useGameStore = create((set, get) => ({
         const currentNodeData = NODES[asset.position];
         if (currentNodeData?.type === 'resource') {
           const resourceType = currentNodeData.resourceType;
-          const production = (currentNodeData.production || 1000) * deltaTime * 0.1; // Slower when idle
-          newResourcesMined[resourceType] = (newResourcesMined[resourceType] || 0) + production;
+          const currentAmount = state.resourcesMined[resourceType] + (newResourcesMined[resourceType] || 0);
+          const capacity = RESOURCE_CAPACITY[resourceType];
+          
+          // Only mine if under capacity - stop mining and costs when full
+          if (currentAmount < capacity) {
+            const baseProduction = (currentNodeData.production || 1000) * deltaTime * 0.1; // Slower when idle
+            const production = Math.min(baseProduction, capacity - currentAmount);
+            if (production > 0) {
+              newResourcesMined[resourceType] = (newResourcesMined[resourceType] || 0) + production;
+              isMiningThisTick = true;
+              miningCostThisTick += state.settings.baseMiningCost * currentMiningCostMultiplier * deltaTime * 0.1;
+            }
+          }
+          // If at capacity, do nothing - no mining, no cost
         }
       }
       
@@ -671,18 +716,32 @@ export const useGameStore = create((set, get) => ({
       ? totalFuelConsumedThisTick * state.settings.fuelCostPerUnit 
       : 0;
     
-    // Apply threat damage and movement cost to budget (rounded to avoid decimals)
-    const newBudget = Math.round((state.budget - newThreatDamage - movementCost) * 100) / 100;
+    // Update mining time (in seconds) - deltaTime is in hours, convert to seconds
+    const miningTimeIncrement = isMiningThisTick ? (deltaTime * 3600 / state.gameSpeed) : 0;
+    const newMiningTimeElapsed = state.miningTimeElapsed + miningTimeIncrement;
+    
+    // Update resources mined (respect capacity limits)
+    const updatedResourcesMined = {
+      oil: Math.min(RESOURCE_CAPACITY.oil, Math.round(state.resourcesMined.oil + newResourcesMined.oil)),
+      gas: Math.min(RESOURCE_CAPACITY.gas, Math.round(state.resourcesMined.gas + newResourcesMined.gas)),
+      minerals: Math.min(RESOURCE_CAPACITY.minerals, Math.round(state.resourcesMined.minerals + newResourcesMined.minerals)),
+    };
+    
+    // Calculate resource storage cost: $1M per 10,000 resources (charged once per day)
+    const RESOURCE_STORAGE_COST_PER_10K = 1.0; // $1M per 10,000 units per day
+    const isNewDay = newDay > state.currentDay;
+    const resourceStorageCost = isNewDay
+      ? (Math.floor(updatedResourcesMined.oil / 10000) * RESOURCE_STORAGE_COST_PER_10K +
+         Math.floor(updatedResourcesMined.gas / 10000) * RESOURCE_STORAGE_COST_PER_10K +
+         Math.floor(updatedResourcesMined.minerals / 10000) * RESOURCE_STORAGE_COST_PER_10K)
+      : 0;
+    
+    // Apply threat damage, movement cost, mining cost, and resource storage cost to budget (rounded to avoid decimals)
+    const totalCosts = newThreatDamage + movementCost + miningCostThisTick + resourceStorageCost;
+    const newBudget = Math.round((state.budget - totalCosts) * 100) / 100;
     
     // Check for game over (budget depleted)
     const isGameOver = newBudget <= 0;
-    
-    // Update resources mined
-    const updatedResourcesMined = {
-      oil: Math.round(state.resourcesMined.oil + newResourcesMined.oil),
-      gas: Math.round(state.resourcesMined.gas + newResourcesMined.gas),
-      minerals: Math.round(state.resourcesMined.minerals + newResourcesMined.minerals),
-    };
     
     // Ice reformation - check for edges that were cleared 7+ days ago
     const ICE_REFORM_DAYS = 7;
@@ -708,6 +767,9 @@ export const useGameStore = create((set, get) => ({
       totalFuelUsed: state.totalFuelUsed + totalFuelConsumedThisTick,
       resourcesMined: updatedResourcesMined,
       portsVisited: newPortsVisited,
+      miningTimeElapsed: newMiningTimeElapsed,
+      miningCostMultiplier: currentMiningCostMultiplier,
+      totalMiningCost: state.totalMiningCost + miningCostThisTick,
       clearedIce: newClearedIce,
       currentIceRisk: newIceRisk,
       stats: {

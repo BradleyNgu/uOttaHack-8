@@ -19,11 +19,13 @@ export default function GameOver() {
     isGameOver,
     stats,
     resourcesMined,
+    resourceCapacity,
     portsVisited,
     allPorts,
     currentDay,
     totalFuelUsed,
     threatDamage,
+    totalMiningCost,
     assets,
     resetGame,
   } = useGameStore();
@@ -132,24 +134,27 @@ export default function GameOver() {
             <div className="resource-item">
               <span className="name">🛢️ Oil</span>
               <div className="bar">
-                <div className="fill oil" style={{ width: `${Math.min(100, resourcesMined.oil / 100)}%` }} />
+                <div className="fill oil" style={{ width: `${(resourcesMined.oil / (resourceCapacity?.oil || 50000)) * 100}%` }} />
               </div>
-              <span className="amount">{resourcesMined.oil.toLocaleString()} units</span>
+              <span className="amount">{resourcesMined.oil.toLocaleString()}/{(resourceCapacity?.oil || 50000).toLocaleString()}</span>
             </div>
             <div className="resource-item">
               <span className="name">💨 Gas</span>
               <div className="bar">
-                <div className="fill gas" style={{ width: `${Math.min(100, resourcesMined.gas / 100)}%` }} />
+                <div className="fill gas" style={{ width: `${(resourcesMined.gas / (resourceCapacity?.gas || 30000)) * 100}%` }} />
               </div>
-              <span className="amount">{resourcesMined.gas.toLocaleString()} units</span>
+              <span className="amount">{resourcesMined.gas.toLocaleString()}/{(resourceCapacity?.gas || 30000).toLocaleString()}</span>
             </div>
             <div className="resource-item">
               <span className="name">💎 Minerals</span>
               <div className="bar">
-                <div className="fill minerals" style={{ width: `${Math.min(100, resourcesMined.minerals / 100)}%` }} />
+                <div className="fill minerals" style={{ width: `${(resourcesMined.minerals / (resourceCapacity?.minerals || 20000)) * 100}%` }} />
               </div>
-              <span className="amount">{resourcesMined.minerals.toLocaleString()} units</span>
+              <span className="amount">{resourcesMined.minerals.toLocaleString()}/{(resourceCapacity?.minerals || 20000).toLocaleString()}</span>
             </div>
+          </div>
+          <div className="mining-cost-summary">
+            <span>💰 Total Mining Cost: <strong>${(totalMiningCost || 0).toFixed(1)}M</strong></span>
           </div>
         </div>
 

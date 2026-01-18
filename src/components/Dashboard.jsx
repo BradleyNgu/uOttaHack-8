@@ -30,6 +30,10 @@ export default function Dashboard() {
     isRunning,
     isPaused,
     resourcesMined,
+    resourceCapacity,
+    miningTimeElapsed,
+    miningCostMultiplier,
+    totalMiningCost,
     portsVisited,
     allPorts,
     clearedIce,
@@ -250,21 +254,61 @@ export default function Dashboard() {
           <div className="resource-row">
             <span className="icon">🛢️</span>
             <span className="name">Oil</span>
-            <span className="amount">{resourcesMined.oil.toLocaleString()}</span>
+            <div className="capacity-bar">
+              <div 
+                className="capacity-fill oil" 
+                style={{ width: `${(resourcesMined.oil / (resourceCapacity?.oil || 50000)) * 100}%` }} 
+              />
+            </div>
+            <span className="amount">{resourcesMined.oil.toLocaleString()}/{(resourceCapacity?.oil || 50000).toLocaleString()}</span>
           </div>
           <div className="resource-row">
             <span className="icon">💨</span>
             <span className="name">Gas</span>
-            <span className="amount">{resourcesMined.gas.toLocaleString()}</span>
+            <div className="capacity-bar">
+              <div 
+                className="capacity-fill gas" 
+                style={{ width: `${(resourcesMined.gas / (resourceCapacity?.gas || 30000)) * 100}%` }} 
+              />
+            </div>
+            <span className="amount">{resourcesMined.gas.toLocaleString()}/{(resourceCapacity?.gas || 30000).toLocaleString()}</span>
           </div>
           <div className="resource-row">
             <span className="icon">💎</span>
             <span className="name">Minerals</span>
-            <span className="amount">{resourcesMined.minerals.toLocaleString()}</span>
+            <div className="capacity-bar">
+              <div 
+                className="capacity-fill minerals" 
+                style={{ width: `${(resourcesMined.minerals / (resourceCapacity?.minerals || 20000)) * 100}%` }} 
+              />
+            </div>
+            <span className="amount">{resourcesMined.minerals.toLocaleString()}/{(resourceCapacity?.minerals || 20000).toLocaleString()}</span>
+          </div>
+        </div>
+        <div className="mining-costs">
+          <div className="cost-row">
+            <span>💰 Mining Cost</span>
+            <span className="cost-value">${(totalMiningCost || 0).toFixed(1)}M spent</span>
+          </div>
+          <div className="cost-row">
+            <span>📦 Storage Cost</span>
+            <span className="cost-value">
+              ${(Math.floor(resourcesMined.oil / 10000) + Math.floor(resourcesMined.gas / 10000) + Math.floor(resourcesMined.minerals / 10000)).toFixed(0)}M/day
+            </span>
+          </div>
+          <div className="cost-row">
+            <span>📈 Inflation</span>
+            <span className="cost-value" style={{ color: (miningCostMultiplier || 1) > 1.5 ? '#ff3b3b' : (miningCostMultiplier || 1) > 1.2 ? '#ffaa00' : '#00ff88' }}>
+              {((miningCostMultiplier || 1) * 100 - 100).toFixed(0)}% increase
+            </span>
+          </div>
+          <div className="cost-row">
+            <span>📅 Week</span>
+            <span className="cost-value">{Math.floor((currentDay - 1) / 7) + 1}</span>
           </div>
         </div>
         <p className="mining-tip">
-          <Ship size={12} /> Deploy Mining Vessel to resource nodes
+          <Ship size={12} /> Mining costs increase 5% every week
         </p>
       </div>
 

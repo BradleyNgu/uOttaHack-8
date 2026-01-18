@@ -1557,6 +1557,57 @@ body {
   font-family: 'Share Tech Mono', monospace;
   color: var(--accent-gold);
   font-weight: 600;
+  font-size: 0.7rem;
+  min-width: 90px;
+  text-align: right;
+}
+
+.resource-row .capacity-bar {
+  flex: 1;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 0 0.5rem;
+}
+
+.resource-row .capacity-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.resource-row .capacity-fill.oil {
+  background: linear-gradient(90deg, #2d2d2d, #555);
+}
+
+.resource-row .capacity-fill.gas {
+  background: linear-gradient(90deg, #4a90a4, #6ab7c9);
+}
+
+.resource-row .capacity-fill.minerals {
+  background: linear-gradient(90deg, #a855f7, #c084fc);
+}
+
+.mining-costs {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.cost-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.cost-row .cost-value {
+  font-family: 'Share Tech Mono', monospace;
+  color: var(--accent-gold);
 }
 
 .mining-tip {
@@ -1883,11 +1934,24 @@ body {
 }
 
 .resource-bars .resource-item .amount {
-  width: 100px;
+  width: 110px;
   text-align: right;
   font-family: 'Share Tech Mono', monospace;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: var(--text-secondary);
+}
+
+.mining-cost-summary {
+  margin-top: 0.75rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border-color);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.mining-cost-summary strong {
+  color: var(--accent-gold);
 }
 
 .ports-summary {
