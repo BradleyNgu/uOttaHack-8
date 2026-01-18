@@ -437,7 +437,11 @@ export const useGameStore = create((set, get) => ({
       timeLimit: threatType.timeLimit || 24, // hours until it causes damage
     };
     
-    set({ threats: [...state.threats, threat] });
+    // Pause the game when a threat spawns
+    set({ 
+      threats: [...state.threats, threat],
+      isPaused: true,
+    });
   },
   
   detectThreat: (threatId) => {
