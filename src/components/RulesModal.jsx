@@ -71,6 +71,10 @@ export default function RulesModal({ isOpen, onClose }) {
                     <span>✈️ Patrol Aircraft</span>
                     <span>Fast detection, flies over ice</span>
                   </div>
+                  <div className="asset-type-item">
+                    <span>🐋 Long Distance Support Vessel</span>
+                    <span>Extremely slow, fuel efficient detection</span>
+                  </div>
                 </div>
               </section>
 
@@ -133,6 +137,16 @@ export default function RulesModal({ isOpen, onClose }) {
                 </ul>
               </section>
 
+              <section className="rules-section">
+                <h3>Weather</h3>
+                <ul>
+                  <li><strong>Extreme Weather:</strong> Breaks out in different regions every day</li>
+                  <li><strong>Effects:</strong> Causes an increase in fuel consumption when entering</li>
+                  <li><strong>Blizzards and Storms:</strong> Doubles consumption</li>
+                  <li><strong>Fog:</strong> Increases consumption by 50%</li>
+                </ul>
+              </section>
+
               {/* Efficiency */}
               <section className="rules-section">
                 <h3>Efficiency Score</h3>
@@ -142,17 +156,6 @@ export default function RulesModal({ isOpen, onClose }) {
                   <li>+0.5 points per % coverage</li>
                   <li>-1 point per 10,000 fuel used</li>
                   <li>-10 points per active threat</li>
-                </ul>
-              </section>
-
-              <section className="rules-section">
-                <h3>Weather</h3>
-                <ul>
-                  <li><strong>Extreme Weather:</strong> Breaks out in different regions every day</li>
-                  <li><strong>Effects:</strong> Causes an increase in fuel consumption when entering</li>
-                  <li><strong>Blizzards and Storms:</strong> Double consumption</li>
-                  <li><strong>Fog:</strong> Increases consumption by 50%</li>
-                  <li><strong>Plan:</strong> Avoid extreme weather</li>
                 </ul>
               </section>
 
