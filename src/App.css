@@ -1331,7 +1331,6 @@ body {
   background: var(--bg-secondary);
   border-radius: 3px;
   outline: none;
-  -webkit-appearance: none;
 }
 
 .setting-item input[type="range"]::-webkit-slider-thumb {

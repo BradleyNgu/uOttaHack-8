@@ -36,7 +36,7 @@ const findPath = (fromId, toId) => {
 
 // Default settings
 const DEFAULT_SETTINGS = {
-  budget: 400,
+  budget: 800,
   threatFrequency: 0.3, // 0-1
   weatherSeverity: 0.3, // 0-1
   fuelCostPerUnit: 0.0005, // cost per fuel unit (in millions) - so 1000 fuel = $0.5M
@@ -70,6 +70,20 @@ EDGES.forEach((edge, index) => {
 // Helper to get edge key (normalized so both directions match)
 const getEdgeKey = (from, to) => {
   return from < to ? `${from}-${to}` : `${to}-${from}`;
+};
+
+// Calculate fuel cost multiplier based on weather
+const getFuelCostMultiplier = (weatherType) => {
+  // Blizzard and storm double the fuel cost (1.0 = normal, 2.0 = double)
+  if (weatherType === 'blizzard' || weatherType === 'storm') {
+    return 2.0;
+  }
+  // Fog increases cost by 50%
+  if (weatherType === 'fog') {
+    return 1.5;
+  }
+  // Clear weather has normal cost
+  return 1.0;
 };
 
 const initialState = {
@@ -130,9 +144,7 @@ const initialState = {
   // Threats
   threats: [],
   detectedThreats: [],
-  
-  // Patrol routes
-  patrolRoutes: [],
+ 
   
   // Statistics
   stats: {
@@ -215,8 +227,7 @@ export const useGameStore = create((set, get) => ({
       targetPosition: null,
       path: [],
       pathIndex: 0,
-      status: 'idle', // idle, moving, patrolling, refueling, intercepting
-      patrolRoute: null,
+      status: 'idle', // idle, moving,  refueling, intercepting
       progress: 0, // 0-1 progress between nodes
       interceptingThreat: null,
     };
@@ -305,22 +316,22 @@ export const useGameStore = create((set, get) => ({
     });
   },
   
-  setPatrolRoute: (assetId, routeNodeIds) => {
-    const state = get();
-    set({
-      assets: state.assets.map((a) =>
-        a.id === assetId
-          ? {
-              ...a,
-              patrolRoute: routeNodeIds,
-              status: 'patrolling',
-              path: routeNodeIds,
-              pathIndex: 0,
-            }
-          : a
-      ),
-    });
-  },
+  // setPatrolRoute: (assetId, routeNodeIds) => {
+  //   const state = get();
+  //   set({
+  //     assets: state.assets.map((a) =>
+  //       a.id === assetId
+  //         ? {
+  //             ...a,
+  //             patrolRoute: routeNodeIds,
+  //             status: 'patrolling',
+  //             path: routeNodeIds,
+  //             pathIndex: 0,
+  //           }
+  //         : a
+  //     ),
+  //   });
+  // },
   
   // Refueling costs per unit of fuel needed
   refuelAsset: (assetId) => {
@@ -408,7 +419,7 @@ export const useGameStore = create((set, get) => ({
   spawnThreat: () => {
     const state = get();
     const threatTypes = Object.values(THREAT_TYPES);
-    const nodeIds = Object.keys(NODES).filter((id) => NODES[id].type === 'patrol');
+    //const nodeIds = Object.keys(NODES).filter((id) => NODES[id].type === 'patrol');
     
     if (Math.random() > state.settings.threatFrequency) return;
     
@@ -421,7 +432,7 @@ export const useGameStore = create((set, get) => ({
       spawnTime: state.currentTime + (state.currentDay - 1) * 24,
       detected: false,
       neutralized: false,
-      timeLimit: threatType.timeLimit || 10, // hours until it causes damage
+      timeLimit: threatType.timeLimit || 24, // hours until it causes damage
     };
     
     set({ threats: [...state.threats, threat] });
@@ -534,7 +545,8 @@ export const useGameStore = create((set, get) => ({
         let newProgress = asset.progress + distancePerTick;
         
         // Fuel consumption
-        const fuelUsed = asset.fuelConsumption * distancePerTick * edge.distance;
+        const weatherCostMultiplier = getFuelCostMultiplier(state.weather[nextNode]);
+        const fuelUsed = asset.fuelConsumption * distancePerTick * edge.distance * weatherCostMultiplier;
         const newFuel = Math.max(0, asset.currentFuel - fuelUsed);
         
         // Track fuel consumed for budget deduction
