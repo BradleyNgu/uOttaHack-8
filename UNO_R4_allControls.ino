@@ -240,19 +240,19 @@ void loop() {
   buttValG = digitalRead(buttPinG);
   buttValB = digitalRead(buttPinB);
 
-  // ---------------- RED BUTTON ----------------
+  // ---------------- RED BUTTON ---------------- Stop
   if (buttValR == 0 && buttValOldR == 1) {
-    //DO SOMETHING --> Stop
+    Serial.println("STOP");
   }
 
-  // ---------------- GREEN BUTTON ----------------
+  // ---------------- GREEN BUTTON ---------------- Start
   if (buttValG == 0 && buttValOldG == 1) {
-    //DO SOMETHING --> Start
+    Serial.println("START");
   }
 
-  // ---------------- BLUE BUTTON ----------------
+  // ---------------- BLUE BUTTON ---------------- Reset
   if (buttValB == 0 && buttValOldB == 1) {
-    //do something --> reset
+    Serial.println("RESET");
   }
 
   buttValOldR = buttValR;
@@ -268,19 +268,19 @@ void loop() {
   buttValBlueIce   = digitalRead(buttPinBlueIcebreaker);
 
 
-  // ---------------- YELLOW BUTTON CIV (Pin 2 -> LED 8) ----------------
+  // ---------------- YELLOW BUTTON Civilian Cargo Ship (Pin 2 -> LED 8) ----------------
   if (buttValYellowCiv == 0 && buttOldYellowCiv == 1) {
 
     Serial.println("Yellow Pressed");
   }
 
-  // ---------------- RED PATROL BUTTON (Pin 3 -> LED 9) ----------------
+  // ---------------- RED BUTTON Patrol Vessel (Pin 3 -> LED 9) ----------------
   if (buttValRedPatrol == 0 && buttOldRedPatrol == 1) {
 
     Serial.println("Red 1 Pressed");
   }
 
-  // ---------------- GREEN BUTTON MINING (Pin 4 -> LED 10) ----------------
+  // ---------------- GREEN BUTTON MINING Miner Vessel(Pin 4 -> LED 10) ----------------
   if (buttValGreenMine == 0 && buttOldGreenMine == 1) {
 
     Serial.println("Green Pressed");
@@ -292,7 +292,7 @@ void loop() {
     Serial.println("Red 2 Pressed");
   }
 
-  // ---------------- WHITE BUTTON (Pin 6 -> LED 12) ----------------
+  // ---------------- WHITE BUTTON Long distance(Pin 6 -> LED 12) ----------------
   if (buttValWhiteSupport == 0 && buttOldWhiteSupport == 1) {
 
     Serial.println("White Pressed");
