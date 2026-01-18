@@ -29,6 +29,7 @@ export default function ArcticMap() {
     selectNode,
     selectAsset,
     moveAsset,
+    interceptThreat,
     weather,
     threats,
     isRunning,
@@ -88,6 +89,21 @@ export default function ArcticMap() {
   const handleAssetClick = (e, assetId) => {
     e.stopPropagation();
     selectAsset(assetId);
+  };
+
+  const handleThreatClick = (e, threatId) => {
+    e.stopPropagation();
+    // If an asset is selected, intercept the threat
+    if (selectedAssetId) {
+      interceptThreat(selectedAssetId, threatId);
+      selectAsset(null); // Deselect after giving command
+    } else {
+      // Otherwise, just move to the threat location (select the node)
+      const threat = threats.find(t => t.id === threatId);
+      if (threat) {
+        selectNode(threat.position);
+      }
+    }
   };
 
   const handleBackgroundClick = (e) => {
@@ -446,7 +462,21 @@ export default function ArcticMap() {
             const threatOpacity = isDetected ? 1 : 0.7;
 
             return (
-              <g key={threat.id} className="threat-marker">
+              <g 
+                key={threat.id} 
+                className="threat-marker"
+                onClick={(e) => handleThreatClick(e, threat.id)}
+                style={{ cursor: 'pointer' }}
+              >
+                {/* Large invisible hitbox for easy clicking */}
+                <circle
+                  cx={node.x}
+                  cy={node.y}
+                  r="35"
+                  fill="transparent"
+                  stroke="none"
+                  style={{ cursor: 'pointer', pointerEvents: 'all' }}
+                />
                 {/* Pulsing alert ring */}
                 <circle
                   cx={node.x}
@@ -457,6 +487,7 @@ export default function ArcticMap() {
                   strokeWidth={isUrgent ? "4" : "3"}
                   opacity={threatOpacity}
                   className="threat-pulse"
+                  style={{ pointerEvents: 'none' }}
                 />
                 {/* Background circle for better visibility */}
                 <circle
@@ -465,6 +496,7 @@ export default function ArcticMap() {
                   r="18"
                   fill={threatColor}
                   opacity={isDetected ? 0.2 : 0.15}
+                  style={{ pointerEvents: 'none' }}
                 />
                 {/* Threat icon */}
                 <text
@@ -473,6 +505,7 @@ export default function ArcticMap() {
                   textAnchor="middle"
                   fontSize={isUrgent ? "22" : "20"}
                   opacity={threatOpacity}
+                  style={{ pointerEvents: 'none' }}
                 >
                   {threat.type.icon}
                 </text>
@@ -486,6 +519,7 @@ export default function ArcticMap() {
                     fill={threatColor}
                     fontWeight="bold"
                     opacity={0.9}
+                    style={{ pointerEvents: 'none' }}
                   >
                     {timeRemaining.toFixed(1)}h
                   </text>
@@ -498,6 +532,7 @@ export default function ArcticMap() {
                     fontSize="12"
                     fill="#00ff88"
                     fontWeight="bold"
+                    style={{ pointerEvents: 'none' }}
                   >
                     👁️
                   </text>
