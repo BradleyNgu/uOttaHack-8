@@ -269,67 +269,37 @@ void loop() {
 
   // ---------------- YELLOW BUTTON CIV (Pin 2 -> LED 8) ----------------
   if (buttValYellowCiv == 0 && buttOldYellowCiv == 1) {
-    digitalWrite(ledPinYellowCivilian, HIGH);
-    digitalWrite(ledPinRedPatrol, LOW);
-    digitalWrite(ledPinGreenMine, LOW);
-    digitalWrite(ledPinRedAir, LOW);
-    digitalWrite(ledPinWhiteSupport, LOW);
-    digitalWrite(ledPinBlueIcebreaker, LOW);
+
     Serial.println("Yellow Pressed");
   }
 
   // ---------------- RED PATROL BUTTON (Pin 3 -> LED 9) ----------------
   if (buttValRedPatrol == 0 && buttOldRedPatrol == 1) {
-    digitalWrite(ledPinYellowCivilian, LOW);
-    digitalWrite(ledPinRedPatrol, HIGH);
-    digitalWrite(ledPinGreenMine, LOW);
-    digitalWrite(ledPinRedAir, LOW);
-    digitalWrite(ledPinWhiteSupport, LOW);
-    digitalWrite(ledPinBlueIcebreaker, LOW);
+
     Serial.println("Red 1 Pressed");
   }
 
   // ---------------- GREEN BUTTON MINING (Pin 4 -> LED 10) ----------------
   if (buttValGreenMine == 0 && buttOldGreenMine == 1) {
-    digitalWrite(ledPinYellowCivilian, LOW);
-    digitalWrite(ledPinRedPatrol, LOW);
-    digitalWrite(ledPinGreenMine, HIGH);
-    digitalWrite(ledPinRedAir, LOW);
-    digitalWrite(ledPinWhiteSupport, LOW);
-    digitalWrite(ledPinBlueIcebreaker, LOW);
+
     Serial.println("Green Pressed");
   }
 
   // ---------------- RED BUTTON AIR(Pin 5 -> LED 11) ----------------
   if (buttValRedAir == 0 && buttOldRedAir == 1) {
-    digitalWrite(ledPinYellowCivilian, LOW);
-    digitalWrite(ledPinRedPatrol, LOW);
-    digitalWrite(ledPinGreenMine, LOW);
-    digitalWrite(ledPinRedAir, HIGH);
-    digitalWrite(ledPinWhiteSupport, LOW);
-    digitalWrite(ledPinBlueIcebreaker, LOW);
+
     Serial.println("Red 2 Pressed");
   }
 
   // ---------------- WHITE BUTTON (Pin 6 -> LED 12) ----------------
   if (buttValWhiteSupport == 0 && buttOldWhiteSupport == 1) {
-    digitalWrite(ledPinYellowCivilian, LOW);
-    digitalWrite(ledPinRedPatrol, LOW);
-    digitalWrite(ledPinGreenMine, LOW);
-    digitalWrite(ledPinRedAir, LOW);
-    digitalWrite(ledPinWhiteSupport, HIGH);
-    digitalWrite(ledPinBlueIcebreaker, LOW);
+
     Serial.println("White Pressed");
   }
 
   // ---------------- BLUE BUTTON IceBreaker (Pin 7 -> LED 13) ----------------
   if (buttValBlueIce == 0 && buttOldBlueIce == 1) {
-    digitalWrite(ledPinYellowCivilian, LOW);
-    digitalWrite(ledPinRedPatrol, LOW);
-    digitalWrite(ledPinGreenMine, LOW);
-    digitalWrite(ledPinRedAir, LOW);
-    digitalWrite(ledPinWhiteSupport, LOW);
-    digitalWrite(ledPinBlueIcebreaker, HIGH);
+
     Serial.println("Blue Pressed");
   }
 
@@ -341,6 +311,6 @@ void loop() {
   buttOldWhiteSupport  = buttValWhiteSupport;
   buttOldBlueIce  = buttValBlueIce;
 
-  delay(10); 
+  delay(100); 
 }
 
