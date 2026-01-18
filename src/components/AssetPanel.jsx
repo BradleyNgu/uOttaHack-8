@@ -20,6 +20,10 @@ export default function AssetPanel() {
   
   // Get detected threats for intercept options
   const detectedThreats = threats.filter(t => t.detected && !t.neutralized);
+  
+  // Only combat-capable assets can intercept threats
+  const combatAssetTypes = ['patrol', 'aircraft', 'icebreaker', 'longDistance'];
+  const canInterceptThreats = (assetTypeId) => combatAssetTypes.includes(assetTypeId);
 
   const handleAddAsset = (assetTypeId) => {
     if (selectedNodeId && NODES[selectedNodeId]?.canRefuel) {
@@ -159,8 +163,8 @@ export default function AssetPanel() {
                     );
                   })()}
                   
-                  {/* Intercept options for selected asset */}
-                  {isSelected && detectedThreats.length > 0 && (
+                  {/* Intercept options for selected asset (only combat-capable assets) */}
+                  {isSelected && detectedThreats.length > 0 && canInterceptThreats(asset.typeId) && (
                     <motion.div
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
