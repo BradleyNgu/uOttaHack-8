@@ -28,7 +28,7 @@ export default function RulesModal({ isOpen, onClose }) {
             }}
           >
             <div className="rules-header">
-              <h2>📖 GAME RULES</h2>
+              <h2>GAME RULES</h2>
               <button className="close-btn" onClick={onClose}>
                 <X size={24} />
               </button>
@@ -37,7 +37,7 @@ export default function RulesModal({ isOpen, onClose }) {
             <div className="rules-content">
               {/* Objective */}
               <section className="rules-section">
-                <h3>🎯 Objective</h3>
+                <h3>Objective</h3>
                 <p>Manage your Arctic patrol operations efficiently while protecting trade routes, extracting resources, and neutralizing threats. Keep your budget above $0 to avoid mission failure.</p>
               </section>
 
@@ -53,11 +53,11 @@ export default function RulesModal({ isOpen, onClose }) {
                 <div className="asset-types">
                   <div className="asset-type-item">
                     <span>⛴️ Civilian Cargo Ship</span>
-                    <span>Visit all ports to complete trade route</span>
+                    <span>Visit all ports to complete trade route, cannot neutralize threats</span>
                   </div>
                   <div className="asset-type-item">
                     <span>🤖 Mining Vessel</span>
-                    <span>Extract resources at resource nodes (gold)</span>
+                    <span>Extract resources at resource nodes, cannot neutralize threats</span>
                   </div>
                   <div className="asset-type-item">
                     <span>🧊 Icebreaker</span>
@@ -109,7 +109,7 @@ export default function RulesModal({ isOpen, onClose }) {
 
               {/* Ice & Routes */}
               <section className="rules-section">
-                <h3>🧊 Ice & Routes</h3>
+                <h3>Ice & Routes</h3>
                 <ul>
                   <li><strong>Ice Risk:</strong> Each route has an ice risk level (0-1)</li>
                   <li><strong>Ice Capability:</strong> Ships have different ice handling abilities</li>
@@ -135,7 +135,7 @@ export default function RulesModal({ isOpen, onClose }) {
 
               {/* Efficiency */}
               <section className="rules-section">
-                <h3>⚡ Efficiency Score</h3>
+                <h3>Efficiency Score</h3>
                 <p>Calculated based on:</p>
                 <ul>
                   <li>+20 points per threat neutralized</li>
@@ -145,9 +145,20 @@ export default function RulesModal({ isOpen, onClose }) {
                 </ul>
               </section>
 
+              <section className="rules-section">
+                <h3>Weather</h3>
+                <ul>
+                  <li>Extreme weather breaks out in different regions every day</li>
+                  <li>Weather causes an increase in fuel consumption when entering</li>
+                  <li>Blizzards and Storms double consumption</li>
+                  <li>Fog increases consumption by 50%</li>
+                  <li>Plan routes accordingly to avoid extreme weather</li>
+                </ul>
+              </section>
+
               {/* Tips */}
               <section className="rules-section">
-                <h3>💡 Pro Tips</h3>
+                <h3>Pro Tips</h3>
                 <ul>
                   <li>Use Icebreaker to open routes for ships with low ice capability</li>
                   <li>Mine resources quickly before inflation increases costs</li>
