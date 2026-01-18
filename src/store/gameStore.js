@@ -419,7 +419,9 @@ export const useGameStore = create((set, get) => ({
   spawnThreat: () => {
     const state = get();
     const threatTypes = Object.values(THREAT_TYPES);
-    //const nodeIds = Object.keys(NODES).filter((id) => NODES[id].type === 'patrol');
+    const nodeIds = Object.keys(NODES).filter((id) => NODES[id].type === 'patrol');
+    
+    if (nodeIds.length === 0) return; // No patrol nodes available
     
     if (Math.random() > state.settings.threatFrequency) return;
     
