@@ -25,15 +25,28 @@ export function useArduino() {
   }, []);
 
   const handleArduinoData = (data) => {
-    const message = data.toUpperCase().trim();
+    // Normalize message: trim, uppercase, and handle parentheses
+    const message = data.trim().toUpperCase();
     console.log('Arduino message received:', message); // Debug log
     
     // Get fresh state from store
     const state = useGameStore.getState();
     
-    // Check for game controls first
-    if (ARDUINO_GAME_CONTROLS[message]) {
-      const control = ARDUINO_GAME_CONTROLS[message];
+    // Check for game controls first (try exact match, then partial match)
+    let control = ARDUINO_GAME_CONTROLS[message];
+    
+    // If exact match not found, try to match by checking if message contains key parts
+    if (!control) {
+      if (message.includes('YES') && message.includes('START')) {
+        control = 'start';
+      } else if (message.includes('RED') && message.includes('STOP')) {
+        control = 'stop';
+      } else if ((message.includes('BBLEK') || message.includes('BLUE')) && message.includes('RESET')) {
+        control = 'reset';
+      }
+    }
+    
+    if (control) {
       
       switch (control) {
         case 'start':

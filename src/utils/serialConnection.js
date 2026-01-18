@@ -134,6 +134,13 @@ export const ARDUINO_ASSET_MAP = {
 
 // Game control mapping
 export const ARDUINO_GAME_CONTROLS = {
+  'YES (START)': 'start',
+  'YES(START)': 'start',
+  'RED (STOP)': 'stop',
+  'RED(STOP)': 'stop',
+  'BBLEK (RESET)': 'reset',
+  'BBLEK(RESET)': 'reset',
+  // Also support old format for backwards compatibility
   'START': 'start',
   'STOP': 'stop',
   'RESET': 'reset',
