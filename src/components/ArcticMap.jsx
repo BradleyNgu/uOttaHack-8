@@ -50,14 +50,51 @@ export default function ArcticMap() {
     (asset) => asset.status === 'moving' || asset.status === 'patrolling' || asset.status === 'intercepting'
   );
   
-  // Show all threats when vehicles are not moving (paused or all idle)
-  const showAllThreats = isPaused || !anyAssetsMoving;
-  
   // Calculate threat time remaining for display
   const currentTotalTime = currentTime + (currentDay - 1) * 24;
   const getThreatTimeRemaining = (threat) => {
     const elapsed = currentTotalTime - threat.spawnTime;
     return Math.max(0, threat.timeLimit - elapsed);
+  };
+  
+  // Calculate distance between two nodes (using their coordinates)
+  const getNodeDistance = (nodeId1, nodeId2) => {
+    const node1 = NODES[nodeId1];
+    const node2 = NODES[nodeId2];
+    if (!node1 || !node2) return Infinity;
+    const dx = node1.x - node2.x;
+    const dy = node1.y - node2.y;
+    return Math.sqrt(dx * dx + dy * dy);
+  };
+  
+  // Check if a threat is within detection range of any asset
+  const isThreatInVision = (threat) => {
+    // Always show detected threats
+    if (threat.detected) return true;
+    
+    // Check if any asset is within detection range
+    for (const asset of assets) {
+      const distance = getNodeDistance(asset.position, threat.position);
+      const weatherCondition = WEATHER_CONDITIONS[weather[threat.position] || 'clear'];
+      const effectiveDetectionRange = asset.detectionRange * weatherCondition.detectionModifier;
+      
+      // Convert detection range to map pixels
+      // Detection range values are 30-300, map is ~800px wide
+      // Scale detection range to map coordinates (rough approximation)
+      // A detection range of 100 should cover about 1/4 of the map (~200px)
+      const detectionRangeInPixels = effectiveDetectionRange * 2.5; // Scale factor
+      
+      if (distance <= detectionRangeInPixels) {
+        return true;
+      }
+      
+      // Also check if asset is moving through threat's location
+      if (asset.path?.includes(threat.position)) {
+        return true;
+      }
+    }
+    
+    return false;
   };
 
   // Convert screen coordinates to SVG viewBox coordinates
@@ -448,9 +485,9 @@ export default function ArcticMap() {
           );
         })}
 
-        {/* Threats */}
+        {/* Threats - only show if within vision/detection range */}
         {threats
-          .filter((t) => !t.neutralized && (showAllThreats || t.detected))
+          .filter((t) => !t.neutralized && isThreatInVision(t))
           .map((threat) => {
             const node = NODES[threat.position];
             if (!node) return null;
@@ -509,8 +546,8 @@ export default function ArcticMap() {
                 >
                   {threat.type.icon}
                 </text>
-                {/* Time remaining label (when paused or not moving) */}
-                {showAllThreats && !isDetected && (
+                {/* Time remaining label for undetected threats in vision */}
+                {!isDetected && (
                   <text
                     x={node.x}
                     y={node.y + 35}
