@@ -7,18 +7,6 @@ export function useArduino() {
   const [connectionStatus, setConnectionStatus] = useState('Disconnected');
   const serialRef = useRef(null);
   
-  const { 
-    selectedNodeId, 
-    addAsset, 
-    startGame, 
-    stopGame, 
-    resetGame,
-    pauseGame,
-    resumeGame,
-    isRunning,
-    isPaused,
-  } = useGameStore();
-
   useEffect(() => {
     // Initialize serial connection
     serialRef.current = new SerialConnection();
@@ -36,17 +24,12 @@ export function useArduino() {
     };
   }, []);
 
-  // Update handler when selectedNodeId changes
-  useEffect(() => {
-    if (serialRef.current) {
-      serialRef.current.onDataReceived = (data) => {
-        handleArduinoData(data);
-      };
-    }
-  }, [selectedNodeId, isRunning, isPaused]);
-
   const handleArduinoData = (data) => {
     const message = data.toUpperCase().trim();
+    console.log('Arduino message received:', message); // Debug log
+    
+    // Get fresh state from store
+    const state = useGameStore.getState();
     
     // Check for game controls first
     if (ARDUINO_GAME_CONTROLS[message]) {
@@ -54,19 +37,19 @@ export function useArduino() {
       
       switch (control) {
         case 'start':
-          if (!isRunning) {
-            startGame();
-          } else if (isPaused) {
-            resumeGame();
+          if (!state.isRunning) {
+            state.startGame();
+          } else if (state.isPaused) {
+            state.resumeGame();
           }
           break;
         case 'stop':
-          if (isRunning) {
-            stopGame();
+          if (state.isRunning) {
+            state.stopGame();
           }
           break;
         case 'reset':
-          resetGame();
+          state.resetGame();
           break;
       }
       return;
@@ -77,8 +60,11 @@ export function useArduino() {
       const assetId = ARDUINO_ASSET_MAP[message];
       
       // Deploy asset if node is selected
-      if (selectedNodeId) {
-        addAsset(assetId, selectedNodeId);
+      if (state.selectedNodeId) {
+        const success = state.addAsset(assetId, state.selectedNodeId);
+        console.log('Asset deployment:', assetId, 'at', state.selectedNodeId, 'success:', success);
+      } else {
+        console.log('No port selected - cannot deploy asset');
       }
     }
   };
@@ -97,6 +83,12 @@ export function useArduino() {
       if (connected) {
         setIsConnected(true);
         setConnectionStatus('Connected');
+        console.log('Arduino connected successfully');
+        
+        // Send a test message to confirm connection
+        setTimeout(() => {
+          serialRef.current.send('TEST');
+        }, 500);
       } else {
         setIsConnected(false);
         setConnectionStatus('Connection Failed');
@@ -106,9 +98,12 @@ export function useArduino() {
     } catch (error) {
       console.error('Connection error:', error);
       setIsConnected(false);
-      setConnectionStatus('Connection Failed');
-      if (error.message.includes('No port selected')) {
+      if (error.message && error.message.includes('No port selected')) {
         setConnectionStatus('No Port Selected');
+      } else if (error.message && error.message.includes('not supported')) {
+        setConnectionStatus('Not Supported');
+      } else {
+        setConnectionStatus('Connection Failed');
       }
       return false;
     }

@@ -22,13 +22,16 @@ export class SerialConnection {
       await this.port.open({ baudRate: 115200 });
       
       this.isConnected = true;
+      console.log('Serial port opened successfully');
       
       // Set up reader
       this.reader = this.port.readable.getReader();
       this.writer = this.port.writable.getWriter();
       
-      // Start reading data
-      this.readLoop();
+      // Start reading data (don't await - it runs in background)
+      this.readLoop().catch(err => {
+        console.error('Read loop error:', err);
+      });
       
       return true;
     } catch (error) {
@@ -59,6 +62,7 @@ export class SerialConnection {
         lines.forEach(line => {
           const trimmed = line.trim();
           if (trimmed && this.onDataReceived) {
+            console.log('Serial data received:', trimmed); // Debug log
             this.onDataReceived(trimmed);
           }
         });

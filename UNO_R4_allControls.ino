@@ -209,7 +209,9 @@ void setup() {
 }
 
 void loop() {
-  
+  // Check buttons first (music blocks button reading)
+  // Comment out music for now to ensure buttons work
+  /*
   //MUSIC
     // iterate over the notes of the melody. 
   // Remember, the array is twice the number of notes (notes + durations)
@@ -235,6 +237,8 @@ void loop() {
     // stop the waveform generation before the next note.
     noTone(buzzer);
   }
+  */
+  
   //GAME MODES
   buttValR = digitalRead(buttPinR);
   buttValG = digitalRead(buttPinG);
