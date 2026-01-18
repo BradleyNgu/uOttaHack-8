@@ -1,10 +1,5 @@
-
-/* 
-  Song of storms - Legend of Zelda 
-  Connect a piezo buzzer or speaker to pin 11 or select a new pin.
-  More songs available at https://github.com/robsoncouto/arduino-songs                                            
-                                              
-                                              Robson Couto, 2019
+/* Song of storms - Legend of Zelda 
+  Fixed for "Multitasking" (Buttons work while music plays)
 */
 
 #define NOTE_B0  31
@@ -98,22 +93,10 @@
 #define NOTE_DS8 4978
 #define REST      0
 
-
-// change this to make the song slower or faster
 int tempo = 108;
-
-// change this to whichever pin you want to use
 int buzzer = 7;
 
-// notes of the moledy followed by the duration.
-// a 4 means a quarter note, 8 an eighteenth , 16 sixteenth, so on
-// !!negative numbers are used to represent dotted notes,
-// so -4 means a dotted quarter note, that is, a quarter plus an eighteenth!!
 int melody[] = {
-  
-  // Song of storms - The Legend of Zelda Ocarina of Time. 
-  // Score available at https://musescore.com/user/4957541/scores/1545401
-  
   NOTE_D4,4, NOTE_A4,4, NOTE_A4,4,
   REST,8, NOTE_E4,8, NOTE_B4,2,
   NOTE_F4,4, NOTE_C5,4, NOTE_C5,4,
@@ -141,177 +124,147 @@ int melody[] = {
   NOTE_D4,1,
 };
 
-// sizeof gives the number of bytes, each int value is composed of two bytes (16 bits)
-// there are two values per note (pitch and duration), so for each note there are four bytes
 int notes = sizeof(melody) / sizeof(melody[0]) / 2;
-
-// this calculates the duration of a whole note in ms
 int wholenote = (60000 * 4) / tempo;
-
 int divider = 0, noteDuration = 0;
 
-//-----------------------------------------------------------------------Pins controls
-//RED --> stop
+// --- PIN DEFINITIONS ---
 int buttPinR = 2;
-//Green --> start
 int buttPinG = 3;
-//Blue --> Reset
 int buttPinB = 4;
 
-int redPin = 9;
-int greenPin = 11; 
-int bluePin = 10;  
-int yellowPin = 12; 
+int buttPinYellowCivilian = 8;
+int buttPinRedPatrol    = 9;
+int buttPinGreenMine   = 10;
+int buttPinRedAir    = 11;
+int buttPinWhiteSupport   = 12;
+int buttPinBlueIcebreaker   = 13;
 
-// Button Variables
+// --- STATE VARIABLES ---
 int buttValR = 1, buttValOldR = 1;
 int buttValG = 1, buttValOldG = 1;
 int buttValB = 1, buttValOldB = 1;
 
-//----------------------------------- select
-
-int buttPinYellowCivilian = 8;
-int buttPinRedPatrol   = 9;
-int buttPinGreenMine  = 10;
-int buttPinRedAir   = 11;
-int buttPinWhiteSupport  = 12;
-int buttPinBlueIcebreaker   = 13;
-
-// --- VARIABLES ---
-// Current State
-int buttValYellowCiv = 1, buttValRedPatrol = 1, buttValGreenMine = 1;
-int buttValRedAir = 1,   buttValWhiteSupport = 1, buttValBlueIce = 1;
-
-// Old State (for tracking presses)
-int buttOldYellowCiv = 1, buttOldRedPatrol = 1, buttOldGreenMine = 1;
-int buttOldRedAir = 1,   buttOldWhiteSupport = 1, buttOldBlueIce = 1;
-
+int buttValYellowCiv = 1, buttOldYellowCiv = 1;
+int buttValRedPatrol = 1, buttOldRedPatrol = 1;
+int buttValGreenMine = 1, buttOldGreenMine = 1;
+int buttValRedAir = 1,    buttOldRedAir = 1;
+int buttValWhiteSupport = 1, buttOldWhiteSupport = 1;
+int buttValBlueIce = 1,   buttOldBlueIce = 1;
 
 void setup() {
   Serial.begin(115200);
 
-
-  // Button Pins Game modes
-  
+  // Initialize Input Pins
   pinMode(buttPinR, INPUT_PULLUP);
   pinMode(buttPinG, INPUT_PULLUP);
   pinMode(buttPinB, INPUT_PULLUP);
 
-  // Button Pins SELECT
-  // Initialize Button Pins
   pinMode(buttPinYellowCivilian, INPUT_PULLUP);
   pinMode(buttPinRedPatrol, INPUT_PULLUP);
   pinMode(buttPinGreenMine, INPUT_PULLUP);
   pinMode(buttPinRedAir, INPUT_PULLUP);
   pinMode(buttPinWhiteSupport, INPUT_PULLUP);
   pinMode(buttPinBlueIcebreaker, INPUT_PULLUP);
-
 }
 
 void loop() {
-  
-  //MUSIC
-    // iterate over the notes of the melody. 
-  // Remember, the array is twice the number of notes (notes + durations)
+  // We play the music note by note
   for (int thisNote = 0; thisNote < notes * 2; thisNote = thisNote + 2) {
 
-    // calculates the duration of each note
+    // 1. Calculate duration
     divider = melody[thisNote + 1];
     if (divider > 0) {
-      // regular note, just proceed
       noteDuration = (wholenote) / divider;
     } else if (divider < 0) {
-      // dotted notes are represented with negative durations!!
       noteDuration = (wholenote) / abs(divider);
-      noteDuration *= 1.5; // increases the duration in half for dotted notes
+      noteDuration *= 1.5; 
     }
 
-    // we only play the note for 90% of the duration, leaving 10% as a pause
-    tone(buzzer, melody[thisNote], noteDuration*0.9);
+    // 2. Start playing the note
+    tone(buzzer, melody[thisNote], noteDuration * 0.9);
 
-    // Wait for the specief duration before playing the next note.
-    delay(noteDuration);
-    
-    // stop the waveform generation before the next note.
+    // 3. THE FIX: "Smart Delay"
+    // Instead of freezing with delay(), we wait in small steps and check buttons constantly!
+    smartDelay(noteDuration);
+
+    // 4. Stop note
     noTone(buzzer);
   }
-  //GAME MODES
+}
+
+// --- NEW FUNCTION: Smart Delay ---
+// This waits for the requested time, but KEEPS checking buttons while waiting!
+void smartDelay(int waitTime) {
+  unsigned long start = millis();
+  
+  while (millis() - start < waitTime) {
+    checkButtons(); // <--- This ensures we never miss a press
+    // No delay() needed here, we just loop really fast
+  }
+}
+
+// --- NEW FUNCTION: Button Logic ---
+// I moved all your button checks here so we can call it easily from anywhere
+void checkButtons() {
+  // Read All Buttons
   buttValR = digitalRead(buttPinR);
   buttValG = digitalRead(buttPinG);
   buttValB = digitalRead(buttPinB);
-
-  // ---------------- RED BUTTON ----------------
-  if (buttValR == 0 && buttValOldR == 1) {
-    //DO SOMETHING --> Stop
-  }
-
-  // ---------------- GREEN BUTTON ----------------
-  if (buttValG == 0 && buttValOldG == 1) {
-    //DO SOMETHING --> Start
-  }
-
-  // ---------------- BLUE BUTTON ----------------
-  if (buttValB == 0 && buttValOldB == 1) {
-    //do something --> reset
-  }
-
-  buttValOldR = buttValR;
-  buttValOldG = buttValG;
-  buttValOldB = buttValB;
-
-   // 1. Read All Buttons
+  
   buttValYellowCiv = digitalRead(buttPinYellowCivilian);
-  buttValRedPatrol   = digitalRead(buttPinRedPatrol);
-  buttValGreenMine  = digitalRead(buttPinGreenMine);
-  buttValRedAir   = digitalRead(buttPinRedAir);
-  buttValWhiteSupport  = digitalRead(buttPinWhiteSupport);
+  buttValRedPatrol = digitalRead(buttPinRedPatrol);
+  buttValGreenMine = digitalRead(buttPinGreenMine);
+  buttValRedAir    = digitalRead(buttPinRedAir);
+  buttValWhiteSupport = digitalRead(buttPinWhiteSupport);
   buttValBlueIce   = digitalRead(buttPinBlueIcebreaker);
 
+  // --- LOGIC CHECKS ---
+  
+  if (buttValR == 0 && buttValOldR == 1) {
+    Serial.println("RED (Stop)");
+  }
 
-  // ---------------- YELLOW BUTTON CIV (Pin 2 -> LED 8) ----------------
+  if (buttValG == 0 && buttValOldG == 1) {
+    Serial.println("YES (Start)");
+  }
+
+  if (buttValB == 0 && buttValOldB == 1) {
+    Serial.println("BBLEK (Reset)");
+  }
+
   if (buttValYellowCiv == 0 && buttOldYellowCiv == 1) {
-
     Serial.println("Yellow Pressed");
   }
 
-  // ---------------- RED PATROL BUTTON (Pin 3 -> LED 9) ----------------
   if (buttValRedPatrol == 0 && buttOldRedPatrol == 1) {
-
     Serial.println("Red 1 Pressed");
   }
 
-  // ---------------- GREEN BUTTON MINING (Pin 4 -> LED 10) ----------------
   if (buttValGreenMine == 0 && buttOldGreenMine == 1) {
-
     Serial.println("Green Pressed");
   }
 
-  // ---------------- RED BUTTON AIR(Pin 5 -> LED 11) ----------------
   if (buttValRedAir == 0 && buttOldRedAir == 1) {
-
     Serial.println("Red 2 Pressed");
   }
 
-  // ---------------- WHITE BUTTON (Pin 6 -> LED 12) ----------------
   if (buttValWhiteSupport == 0 && buttOldWhiteSupport == 1) {
-
     Serial.println("White Pressed");
   }
 
-  // ---------------- BLUE BUTTON IceBreaker (Pin 7 -> LED 13) ----------------
   if (buttValBlueIce == 0 && buttOldBlueIce == 1) {
-
     Serial.println("Blue Pressed");
   }
 
   // Update Old Values
+  buttValOldR = buttValR;
+  buttValOldG = buttValG;
+  buttValOldB = buttValB;
   buttOldYellowCiv = buttValYellowCiv;
-  buttOldRedPatrol   = buttValRedPatrol;
-  buttOldGreenMine  = buttValGreenMine;
-  buttOldRedAir   = buttValRedAir;
-  buttOldWhiteSupport  = buttValWhiteSupport;
-  buttOldBlueIce  = buttValBlueIce;
-
-  delay(10); 
+  buttOldRedPatrol = buttValRedPatrol;
+  buttOldGreenMine = buttValGreenMine;
+  buttOldRedAir = buttValRedAir;
+  buttOldWhiteSupport = buttValWhiteSupport;
+  buttOldBlueIce = buttValBlueIce;
 }
-
