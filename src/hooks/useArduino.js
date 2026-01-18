@@ -36,11 +36,12 @@ export function useArduino() {
     let control = ARDUINO_GAME_CONTROLS[message];
     
     // If exact match not found, try to match by checking if message contains key parts
+    // Note: After swap, RED button is START, GREEN (YES) button is STOP
     if (!control) {
-      if (message.includes('YES') && message.includes('START')) {
-        control = 'start';
-      } else if (message.includes('RED') && message.includes('STOP')) {
-        control = 'stop';
+      if (message.includes('RED') && message.includes('STOP')) {
+        control = 'start';  // RED button starts the game
+      } else if (message.includes('YES') && message.includes('START')) {
+        control = 'stop';   // GREEN (YES) button stops the game
       } else if ((message.includes('BBLEK') || message.includes('BLUE')) && message.includes('RESET')) {
         control = 'reset';
       }

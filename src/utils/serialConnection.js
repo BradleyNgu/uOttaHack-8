@@ -127,17 +127,17 @@ export const ARDUINO_ASSET_MAP = {
   'YELLOW PRESSED': 'civilianShip',
   'RED 1 PRESSED': 'patrol',
   'GREEN PRESSED': 'mining',
-  'RED 2 PRESSED': 'aircraft',
-  'WHITE PRESSED': 'longDistance',
-  'BLUE PRESSED': 'icebreaker',
+  'RED 2 PRESSED': 'icebreaker',      // Button 4 → Icebreaker
+  'WHITE PRESSED': 'aircraft',        // Button 5 → Aircraft
+  'BLUE PRESSED': 'longDistance',     // Button 6 → Long Distance
 };
 
-// Game control mapping
+// Game control mapping (swapped: RED = START, GREEN = STOP)
 export const ARDUINO_GAME_CONTROLS = {
-  'YES (START)': 'start',
-  'YES(START)': 'start',
-  'RED (STOP)': 'stop',
-  'RED(STOP)': 'stop',
+  'RED (STOP)': 'start',              // RED button now starts
+  'RED(STOP)': 'start',
+  'YES (START)': 'stop',               // GREEN button now stops
+  'YES(START)': 'stop',
   'BBLEK (RESET)': 'reset',
   'BBLEK(RESET)': 'reset',
   // Also support old format for backwards compatibility
