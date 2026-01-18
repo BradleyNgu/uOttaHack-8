@@ -71,6 +71,10 @@ export default function RulesModal({ isOpen, onClose }) {
                     <span>✈️ Patrol Aircraft</span>
                     <span>Fast detection, flies over ice</span>
                   </div>
+                  <div className="asset-type-item">
+                    <span>🐋 Long Distance Support Vessel</span>
+                    <span>Extremely slow, fuel efficient detection</span>
+                  </div>
                 </div>
               </section>
 
