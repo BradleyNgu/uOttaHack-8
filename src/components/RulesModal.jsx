@@ -87,6 +87,7 @@ export default function RulesModal({ isOpen, onClose }) {
                   <li><strong>Neutralize:</strong> Send assets to threat location to neutralize</li>
                   <li><strong>Damage:</strong> Expired threats deduct budget</li>
                   <li><strong>Detection:</strong> Assets near threats can detect them</li>
+                  <li><strong>Emgerence:</strong> Threats can only appear on the patrol points</li>
                 </ul>
               </section>
 
