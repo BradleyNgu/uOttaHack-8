@@ -1,16 +1,19 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import { Info } from 'lucide-react';
 import ArcticMap from './components/ArcticMap';
 import ControlPanel from './components/ControlPanel';
 import AssetPanel from './components/AssetPanel';
 import Dashboard from './components/Dashboard';
 import GameOver from './components/GameOver';
+import RulesModal from './components/RulesModal';
 import { useGameStore } from './store/gameStore';
 import './App.css';
 import logoImage from './assets/logo.png';
 
 function App() {
   const { tick, isRunning, isPaused, gameSpeed, updateWeather, spawnThreat, currentDay } = useGameStore();
+  const [showRules, setShowRules] = useState(false);
 
   // Game loop
   useEffect(() => {
@@ -46,6 +49,9 @@ function App() {
       {/* Game Over Overlay */}
       <GameOver />
 
+      {/* Rules Modal */}
+      <RulesModal isOpen={showRules} onClose={() => setShowRules(false)} />
+
       {/* Header */}
       <motion.header
         className="app-header"
@@ -60,6 +66,14 @@ function App() {
           </div>
         </div>
         <div className="header-info">
+          <button 
+            className="info-btn"
+            onClick={() => setShowRules(true)}
+            title="View Game Rules"
+          >
+            <Info size={20} />
+            <span>Rules</span>
+          </button>
         </div>
       </motion.header>
 
