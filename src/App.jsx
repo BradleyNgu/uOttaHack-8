@@ -9,7 +9,7 @@ import GameOver from './components/GameOver';
 import RulesModal from './components/RulesModal';
 import { useGameStore } from './store/gameStore';
 import './App.css';
-import logoImage from './assets/logo.png';
+import logoImage from './assets/Logo.png';
 
 function App() {
   const { tick, isRunning, isPaused, gameSpeed, updateWeather, spawnThreat, currentDay } = useGameStore();
