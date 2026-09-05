@@ -84,37 +84,37 @@ export default function Dashboard() {
       icon: Shield,
       label: 'Coverage',
       value: `${Math.round(coveragePercent)}%`,
-      color: coveragePercent > 60 ? '#00ff88' : coveragePercent > 30 ? '#ffaa00' : '#ff3333',
+      color: coveragePercent > 60 ? '#8fbc6b' : coveragePercent > 30 ? '#d4893a' : '#c45c4a',
     },
     {
       icon: AlertTriangle,
       label: 'Active Threats',
       value: activeThreats.length,
-      color: activeThreats.length === 0 ? '#00ff88' : activeThreats.length < 3 ? '#ffaa00' : '#ff3333',
+      color: activeThreats.length === 0 ? '#8fbc6b' : activeThreats.length < 3 ? '#d4893a' : '#c45c4a',
     },
     {
       icon: Target,
       label: 'Neutralized',
       value: stats.threatsNeutralized,
-      color: '#00d4ff',
+      color: '#7a9a5c',
     },
     {
       icon: Clock,
       label: 'Avg Response',
       value: `${avgResponseTime.toFixed(1)}h`,
-      color: avgResponseTime < 2 ? '#00ff88' : avgResponseTime < 5 ? '#ffaa00' : '#ff3333',
+      color: avgResponseTime < 2 ? '#8fbc6b' : avgResponseTime < 5 ? '#d4893a' : '#c45c4a',
     },
     {
       icon: Fuel,
       label: 'Fuel Used',
       value: `${Math.round(totalFuelUsed / 1000)}K`,
-      color: '#ffd700',
+      color: '#c9a227',
     },
     {
       icon: TrendingUp,
       label: 'Efficiency',
       value: `${Math.round(efficiencyScore)}`,
-      color: efficiencyScore > 70 ? '#00ff88' : efficiencyScore > 40 ? '#ffaa00' : '#ff3333',
+      color: efficiencyScore > 70 ? '#8fbc6b' : efficiencyScore > 40 ? '#d4893a' : '#c45c4a',
     },
   ];
 
@@ -161,7 +161,7 @@ export default function Dashboard() {
           </div>
           <div className="status-item">
             <span className="label">Damage</span>
-            <span className="value" style={{ color: threatDamage > 0 ? '#ff3b3b' : 'inherit' }}>
+            <span className="value" style={{ color: threatDamage > 0 ? '#c45c4a' : 'inherit' }}>
               ${Math.round(threatDamage)}M
             </span>
           </div>
@@ -170,7 +170,7 @@ export default function Dashboard() {
 
       {/* Threat Log */}
       <div className="threat-log">
-        <h3>⚠️ Active Threats ({activeThreats.length})</h3>
+        <h3>Active Threats ({activeThreats.length})</h3>
         <div className="threat-list">
           {threats.length === 0 ? (
             <div className="no-threats">
@@ -201,7 +201,7 @@ export default function Dashboard() {
                       </span>
                     )}
                     <span className={`status ${threat.neutralized ? 'success' : threat.detected ? 'warning' : 'danger'}`}>
-                      {threat.neutralized ? '✓ Done' : threat.detected ? '👁️ Found' : '❓ Hidden'}
+                      {threat.neutralized ? 'Done' : threat.detected ? 'Detected' : 'Hidden'}
                     </span>
                   </div>
                 </motion.div>
@@ -211,7 +211,7 @@ export default function Dashboard() {
         </div>
         {stats.threatsExpired > 0 && (
           <div className="threat-stats">
-            <span className="expired">💀 {stats.threatsExpired} expired (-${Math.round(threatDamage)}M)</span>
+            <span className="expired">{stats.threatsExpired} expired (-${Math.round(threatDamage)}M)</span>
             <span className="neutralized">✅ {stats.threatsNeutralized} neutralized</span>
           </div>
         )}
@@ -219,7 +219,7 @@ export default function Dashboard() {
 
       {/* Coverage Map Mini */}
       <div className="coverage-indicator">
-        <h3>🗺️ Coverage Analysis</h3>
+        <h3>Coverage Analysis</h3>
         <div className="coverage-bar">
           <div
             className="coverage-fill"
@@ -295,7 +295,7 @@ export default function Dashboard() {
           </div>
           <div className="cost-row">
             <span>📈 Inflation</span>
-            <span className="cost-value" style={{ color: (miningCostMultiplier || 1) > 1.5 ? '#ff3b3b' : (miningCostMultiplier || 1) > 1.2 ? '#ffaa00' : '#00ff88' }}>
+            <span className="cost-value" style={{ color: (miningCostMultiplier || 1) > 1.5 ? '#c45c4a' : (miningCostMultiplier || 1) > 1.2 ? '#d4893a' : '#8fbc6b' }}>
               {((miningCostMultiplier || 1) * 100 - 100).toFixed(0)}% increase
             </span>
           </div>
@@ -373,7 +373,7 @@ export default function Dashboard() {
 
       {/* Resource Efficiency */}
       <div className="efficiency-panel">
-        <h3>⚡ Resource Efficiency</h3>
+        <h3>Resource Efficiency</h3>
         <div className="efficiency-score">
           <svg viewBox="0 0 100 100" className="score-ring">
             <circle
@@ -389,7 +389,7 @@ export default function Dashboard() {
               cy="50"
               r="45"
               fill="none"
-              stroke={efficiencyScore > 70 ? '#00ff88' : efficiencyScore > 40 ? '#ffaa00' : '#ff3333'}
+              stroke={efficiencyScore > 70 ? '#8fbc6b' : efficiencyScore > 40 ? '#d4893a' : '#c45c4a'}
               strokeWidth="8"
               strokeDasharray={`${(efficiencyScore / 100) * 283} 283`}
               strokeLinecap="round"
@@ -405,7 +405,7 @@ export default function Dashboard() {
             <p className="tip success">✅ All assets arrived - simulation paused</p>
           )}
           {coveragePercent < 50 && (
-            <p className="tip">📍 Deploy more assets to increase coverage</p>
+            <p className="tip">Deploy more assets to increase coverage</p>
           )}
           {totalFuelUsed > 50000 && (
             <p className="tip">⛽ Consider shorter patrol routes to save fuel</p>
@@ -414,7 +414,7 @@ export default function Dashboard() {
             <p className="tip">🚨 Multiple threats require immediate response</p>
           )}
           {assets.length === 0 && (
-            <p className="tip">🚢 Deploy your first asset to begin operations</p>
+            <p className="tip">Deploy your first asset to begin operations</p>
           )}
         </div>
       </div>

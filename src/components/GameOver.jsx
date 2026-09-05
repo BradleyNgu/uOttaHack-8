@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { 
   Trophy, 
-  Skull, 
+  Flag, 
   Ship, 
   Pickaxe, 
   MapPin, 
@@ -58,23 +58,23 @@ export default function GameOver() {
     // Penalties
     score -= stats.threatsExpired * 3;
     
-    if (score >= 90) return { grade: 'S', color: '#ffd700' };
-    if (score >= 75) return { grade: 'A', color: '#00ff88' };
-    if (score >= 60) return { grade: 'B', color: '#00d4ff' };
-    if (score >= 45) return { grade: 'C', color: '#ffaa00' };
-    if (score >= 30) return { grade: 'D', color: '#ff9f43' };
-    return { grade: 'F', color: '#ff3b3b' };
+    if (score >= 90) return { grade: 'S', color: '#c9a227' };
+    if (score >= 75) return { grade: 'A', color: '#8fbc6b' };
+    if (score >= 60) return { grade: 'B', color: '#7a9a5c' };
+    if (score >= 45) return { grade: 'C', color: '#d4893a' };
+    if (score >= 30) return { grade: 'D', color: '#d4893a' };
+    return { grade: 'F', color: '#c45c4a' };
   };
 
   const gradeInfo = calculateGrade();
 
   const statItems = [
-    { icon: Clock, label: 'Days Survived', value: currentDay, color: '#00d4ff' },
-    { icon: Ship, label: 'Assets Deployed', value: assets.length, color: '#00ff88' },
-    { icon: Shield, label: 'Threats Neutralized', value: stats.threatsNeutralized, color: '#00ff88' },
-    { icon: AlertTriangle, label: 'Threats Expired', value: stats.threatsExpired, color: '#ff3b3b' },
-    { icon: MapPin, label: 'Ports Visited', value: `${portsVisitedCount}/${totalPorts}`, color: allPortsVisited ? '#ffd700' : '#ffaa00' },
-    { icon: Fuel, label: 'Total Fuel Used', value: `${Math.round(totalFuelUsed / 1000)}K`, color: '#ffaa00' },
+    { icon: Clock, label: 'Days Survived', value: currentDay, color: '#7a9a5c' },
+    { icon: Ship, label: 'Assets Deployed', value: assets.length, color: '#8fbc6b' },
+    { icon: Shield, label: 'Threats Neutralized', value: stats.threatsNeutralized, color: '#8fbc6b' },
+    { icon: AlertTriangle, label: 'Threats Expired', value: stats.threatsExpired, color: '#c45c4a' },
+    { icon: MapPin, label: 'Ports Visited', value: `${portsVisitedCount}/${totalPorts}`, color: allPortsVisited ? '#c9a227' : '#d4893a' },
+    { icon: Fuel, label: 'Total Fuel Used', value: `${Math.round(totalFuelUsed / 1000)}K`, color: '#d4893a' },
   ];
 
   return (
@@ -92,9 +92,9 @@ export default function GameOver() {
       >
         {/* Header */}
         <div className="game-over-header">
-          <Skull className="skull-icon" size={48} />
+          <Flag className="skull-icon" size={40} />
           <h1>SIMULATION ENDED</h1>
-          <p className="subtitle">Budget Depleted - Operations Ceased</p>
+          <p className="subtitle">Budget depleted — operations ceased</p>
         </div>
 
         {/* Grade */}
@@ -189,7 +189,7 @@ export default function GameOver() {
         {/* Threat Damage */}
         {threatDamage > 0 && (
           <div className="damage-summary">
-            <span className="damage-icon">💀</span>
+            <span className="damage-icon">×</span>
             <span className="damage-text">
               ${Math.round(threatDamage)}M lost to unhandled threats
             </span>

@@ -117,7 +117,7 @@ function App() {
       <footer className="app-footer">
         <span>uOttaHack 8</span>
         <span className={`status ${!isRunning ? 'stopped' : isPaused ? 'paused' : 'active'}`}>
-          {!isRunning ? '⏹ SIMULATION STOPPED' : isPaused ? '⏸ SIMULATION PAUSED' : '▶ SIMULATION ACTIVE'}
+          {!isRunning ? 'SIM STOPPED' : isPaused ? 'SIM PAUSED' : 'SIM ACTIVE'}
         </span>
       </footer>
     </div>

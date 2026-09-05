@@ -4,9 +4,9 @@ import { useGameStore } from '../store/gameStore';
 import { NODES, EDGES, WEATHER_CONDITIONS } from '../data/arcticData';
 
 const NODE_COLORS = {
-  port: '#00d4ff',
-  resource: '#ffd700',
-  patrol: '#ff6b6b',
+  port: '#8fbc6b',
+  resource: '#c9a227',
+  patrol: '#c45c4a',
 };
 
 const NODE_SIZES = {
@@ -187,16 +187,16 @@ export default function ArcticMap() {
         {/* Background gradient */}
         <defs>
           <linearGradient id="oceanGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#0a1628" />
-            <stop offset="50%" stopColor="#0d2847" />
-            <stop offset="100%" stopColor="#1a4a6e" />
+            <stop offset="0%" stopColor="#141810" />
+            <stop offset="50%" stopColor="#1a2218" />
+            <stop offset="100%" stopColor="#1e281c" />
           </linearGradient>
           <radialGradient id="nodeGlow" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="white" stopOpacity="0.3" />
-            <stop offset="100%" stopColor="white" stopOpacity="0" />
+            <stop offset="0%" stopColor="#8fbc6b" stopOpacity="0.15" />
+            <stop offset="100%" stopColor="#8fbc6b" stopOpacity="0" />
           </radialGradient>
           <filter id="glow">
-            <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+            <feGaussianBlur stdDeviation="0.8" result="coloredBlur" />
             <feMerge>
               <feMergeNode in="coloredBlur" />
               <feMergeNode in="SourceGraphic" />
@@ -208,10 +208,10 @@ export default function ArcticMap() {
         <rect width="800" height="550" fill="url(#oceanGradient)" />
 
         {/* Ice/land masses (decorative) */}
-        <ellipse cx="150" cy="100" rx="120" ry="60" fill="#1e3a5f" opacity="0.5" />
-        <ellipse cx="450" cy="80" rx="180" ry="50" fill="#1e3a5f" opacity="0.5" />
-        <ellipse cx="700" cy="150" rx="100" ry="80" fill="#1e3a5f" opacity="0.5" />
-        <ellipse cx="600" cy="350" rx="150" ry="100" fill="#1e3a5f" opacity="0.4" />
+        <ellipse cx="150" cy="100" rx="120" ry="60" fill="#2a3428" opacity="0.55" />
+        <ellipse cx="450" cy="80" rx="180" ry="50" fill="#2a3428" opacity="0.55" />
+        <ellipse cx="700" cy="150" rx="100" ry="80" fill="#2a3428" opacity="0.45" />
+        <ellipse cx="600" cy="350" rx="150" ry="100" fill="#2a3428" opacity="0.4" />
 
         {/* Grid lines */}
         {[100, 200, 300, 400, 500].map((y) => (
@@ -221,7 +221,7 @@ export default function ArcticMap() {
             y1={y}
             x2="800"
             y2={y}
-            stroke="#1e4a6e"
+            stroke="#3a4634"
             strokeWidth="0.5"
             strokeDasharray="5,5"
             opacity="0.3"
@@ -234,7 +234,7 @@ export default function ArcticMap() {
             y1="0"
             x2={x}
             y2="550"
-            stroke="#1e4a6e"
+            stroke="#3a4634"
             strokeWidth="0.5"
             strokeDasharray="5,5"
             opacity="0.3"
@@ -299,7 +299,7 @@ export default function ArcticMap() {
                 y1={fromNode.y}
                 x2={toNode.x}
                 y2={toNode.y}
-                stroke={isHovered ? (isCleared ? '#00ff88' : '#00d4ff') : iceColor}
+                stroke={isHovered ? (isCleared ? '#8fbc6b' : '#7a9a5c') : iceColor}
                 strokeWidth={isHovered ? 12 : 8}
                 opacity={isHovered ? 0.6 : (isCleared ? 0.4 : 0.3)}
                 pointerEvents="none"
@@ -310,7 +310,7 @@ export default function ArcticMap() {
                 y1={fromNode.y}
                 x2={toNode.x}
                 y2={toNode.y}
-                stroke={isCleared ? '#00ff88' : (isHovered ? '#00d4ff' : '#3a7ca5')}
+                stroke={isCleared ? '#8fbc6b' : (isHovered ? '#7a9a5c' : '#6a8a50')}
                 strokeWidth={isHovered ? 3 : 2}
                 strokeDasharray={isCleared ? "8,2" : "4,4"}
                 opacity={isHovered ? 1 : 0.7}
@@ -321,7 +321,7 @@ export default function ArcticMap() {
                 <text
                   x={(fromNode.x + toNode.x) / 2}
                   y={(fromNode.y + toNode.y) / 2 + 10}
-                  fill="#00ff88"
+                  fill="#8fbc6b"
                   fontSize="8"
                   textAnchor="middle"
                   opacity="0.9"
@@ -334,7 +334,7 @@ export default function ArcticMap() {
               <text
                 x={(fromNode.x + toNode.x) / 2}
                 y={(fromNode.y + toNode.y) / 2 - 5}
-                fill={isCleared ? '#00ff88' : (isHovered ? '#fff' : '#6bb8d9')}
+                fill={isCleared ? '#8fbc6b' : (isHovered ? '#fff' : '#9aba70')}
                 fontSize={isHovered ? 11 : 9}
                 fontWeight={isHovered ? 'bold' : 'normal'}
                 textAnchor="middle"
@@ -363,7 +363,7 @@ export default function ArcticMap() {
               key={`path-${asset.id}`}
               d={pathD}
               fill="none"
-              stroke="#00ff88"
+              stroke="#8fbc6b"
               strokeWidth="3"
               strokeDasharray="8,4"
               opacity="0.6"
@@ -402,7 +402,7 @@ export default function ArcticMap() {
                   cy={node.y}
                   r={size + 8}
                   fill="none"
-                  stroke="#00ff88"
+                  stroke="#8fbc6b"
                   strokeWidth="3"
                   className="pulse-ring"
                   pointerEvents="none"
@@ -495,7 +495,7 @@ export default function ArcticMap() {
             const timeRemaining = getThreatTimeRemaining(threat);
             const isUrgent = timeRemaining < 3;
             const isDetected = threat.detected;
-            const threatColor = isUrgent ? '#ff3b3b' : isDetected ? '#ff9f43' : '#ff6b6b';
+            const threatColor = isUrgent ? '#c45c4a' : isDetected ? '#d4893a' : '#c45c4a';
             const threatOpacity = isDetected ? 1 : 0.7;
 
             return (
@@ -567,11 +567,11 @@ export default function ArcticMap() {
                     x={node.x + 15}
                     y={node.y - 15}
                     fontSize="12"
-                    fill="#00ff88"
+                    fill="#8fbc6b"
                     fontWeight="bold"
                     style={{ pointerEvents: 'none' }}
                   >
-                    👁️
+                    DET
                   </text>
                 )}
               </g>
@@ -636,7 +636,7 @@ export default function ArcticMap() {
                   cy={assetY}
                   r="22"
                   fill="none"
-                  stroke="#00ff88"
+                  stroke="#8fbc6b"
                   strokeWidth="3"
                   className="pulse-ring"
                   pointerEvents="none"
@@ -648,8 +648,8 @@ export default function ArcticMap() {
                 cx={assetX}
                 cy={assetY}
                 r="15"
-                fill="#1a1a2e"
-                stroke={isSelected ? '#00ff88' : '#4a9eff'}
+                fill="#1a1f17"
+                stroke={isSelected ? '#c9a227' : '#7a9a5c'}
                 strokeWidth="2"
                 pointerEvents="none"
               />
@@ -680,7 +680,7 @@ export default function ArcticMap() {
                 y={assetY + 18}
                 width={(24 * fuelPercent) / 100}
                 height="4"
-                fill={fuelPercent > 30 ? '#00ff88' : fuelPercent > 15 ? '#ffaa00' : '#ff3333'}
+                fill={fuelPercent > 30 ? '#8fbc6b' : fuelPercent > 15 ? '#d4893a' : '#c45c4a'}
                 rx="2"
                 pointerEvents="none"
               />
@@ -704,23 +704,23 @@ export default function ArcticMap() {
         })}
 
         {/* Map title */}
-        <text x="400" y="30" textAnchor="middle" fill="#fff" fontSize="18" fontWeight="bold">
-          OPERATIONS MAP
+        <text x="400" y="30" textAnchor="middle" fill="#8fbc6b" fontSize="16" fontWeight="600" letterSpacing="3">
+          TACTICAL DISPLAY — AOR NORTH
         </text>
-        <text x="400" y="48" textAnchor="middle" fill="#6bb8d9" fontSize="11">
-          Canadian Arctic Patrol Overview
+        <text x="400" y="48" textAnchor="middle" fill="#6a7360" fontSize="10" letterSpacing="1.5">
+          Canadian Arctic patrol overview
         </text>
 
         {/* Legend */}
         <g className="map-legend-svg">
-          <rect x="10" y="440" width="120" height="100" fill="rgba(0, 0, 0, 0.7)" rx="5" />
-          <text x="20" y="460" fill="#fff" fontSize="14" fontWeight="bold">LEGEND</text>
+          <rect x="10" y="440" width="120" height="100" fill="rgba(18, 21, 16, 0.92)" stroke="#4a5640" strokeWidth="1" />
+          <text x="20" y="460" fill="#7a9a5c" fontSize="11" fontWeight="600" letterSpacing="1">LEGEND</text>
           <circle cx="25" cy="477" r="4" fill={NODE_COLORS.port} />
-          <text x="35" y="480" fill="#fff" fontSize="11">Ports</text>
+          <text x="35" y="480" fill="#d8dcc8" fontSize="10">Ports</text>
           <circle cx="25" cy="497" r="4" fill={NODE_COLORS.resource} />
-          <text x="35" y="500" fill="#fff" fontSize="11">Resources</text>
+          <text x="35" y="500" fill="#d8dcc8" fontSize="10">Resources</text>
           <circle cx="25" cy="517" r="4" fill={NODE_COLORS.patrol} />
-          <text x="35" y="520" fill="#fff" fontSize="11">Patrol Points</text>
+          <text x="35" y="520" fill="#d8dcc8" fontSize="10">Patrol Points</text>
         </g>
       </svg>
 
@@ -746,7 +746,7 @@ export default function ArcticMap() {
             {NODES[hoveredNode].canRefuel && (
               <p className="refuel">Fuel Left: {NODES[hoveredNode].fuelCapacity}</p>
             )}
-            <p className="weather" style={{ color: '#00ff88' }}>
+            <p className="weather" style={{ color: '#8fbc6b' }}>
               Current Weather: {WEATHER_CONDITIONS[weather[hoveredNode]]?.name} {' '}
             </p>
           </motion.div>
@@ -775,7 +775,7 @@ export default function ArcticMap() {
               const isRouteCleared = clearedIce?.[edgeKey] !== undefined;
               const icePercent = Math.round(dynamicIce * 100);
               const iceLevel = icePercent === 0 ? 'Cleared' : icePercent >= 70 ? 'Severe' : icePercent >= 50 ? 'Heavy' : icePercent >= 30 ? 'Moderate' : 'Light';
-              const iceColor = icePercent === 0 ? '#00ff88' : icePercent >= 70 ? '#ff3b3b' : icePercent >= 50 ? '#ff9f43' : icePercent >= 30 ? '#ffd700' : '#00ff88';
+              const iceColor = icePercent === 0 ? '#8fbc6b' : icePercent >= 70 ? '#c45c4a' : icePercent >= 50 ? '#d4893a' : icePercent >= 30 ? '#c9a227' : '#8fbc6b';
               
               return (
                 <>
@@ -803,10 +803,10 @@ export default function ArcticMap() {
                     {isRouteCleared
                       ? '✅ Any ship can pass through!'
                       : icePercent >= 50 
-                      ? '⚠️ Icebreaker recommended'
+                      ? 'Icebreaker recommended'
                       : icePercent >= 40
-                      ? '⚠️ Patrol vessels may have difficulty'
-                      : '✓ Safe for most vessels'}
+                      ? 'Patrol vessels may have difficulty'
+                      : 'Safe for most vessels'}
                   </p>
                 </>
               );

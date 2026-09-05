@@ -70,9 +70,9 @@ export default function AssetPanel() {
                   </span>
                 </div>
                 <div className="stats">
-                  <span>⚡ {type.speed}kn</span>
-                  <span>👁️ {type.detectionRange}nm</span>
-                  <span>❄️ {Math.round(type.iceCapability * 100)}%</span>
+                  <span>{type.speed} kn</span>
+                  <span>{type.detectionRange} nm</span>
+                  <span>Ice {Math.round(type.iceCapability * 100)}%</span>
                 </div>
               </motion.button>
             );
@@ -118,10 +118,10 @@ export default function AssetPanel() {
                           width: `${fuelPercent}%`,
                           background:
                             fuelPercent > 30
-                              ? '#00ff88'
+                              ? '#8fbc6b'
                               : fuelPercent > 15
-                              ? '#ffaa00'
-                              : '#ff3333',
+                              ? '#d4893a'
+                              : '#c45c4a',
                         }}
                       />
                     </div>
@@ -170,7 +170,7 @@ export default function AssetPanel() {
                       animate={{ opacity: 1, height: 'auto' }}
                       className="intercept-options"
                     >
-                      <span className="intercept-label">🎯 Intercept Threat:</span>
+                      <span className="intercept-label">Intercept threat</span>
                       {detectedThreats.slice(0, 3).map((threat) => (
                         <button
                           key={threat.id}

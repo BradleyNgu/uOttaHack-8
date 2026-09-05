@@ -62,7 +62,7 @@ export default function ControlPanel() {
             >
               <div className="instruction-step">
                 <span className="step-num">1</span>
-                <span>Click a <strong>cyan port</strong> on the map</span>
+                <span>Click a <strong>port</strong> on the map</span>
               </div>
               <div className="instruction-step">
                 <span className="step-num">2</span>
@@ -78,7 +78,7 @@ export default function ControlPanel() {
               </div>
               <div className="instruction-step">
                 <span className="step-num">5</span>
-                <span>Intercept <strong>⚠️ threats</strong> before they expire!</span>
+                <span>Intercept <strong>threats</strong> before they expire</span>
               </div>
 
             </motion.div>
@@ -112,7 +112,7 @@ export default function ControlPanel() {
         {isConnected && (
           <span className="arduino-status" style={{ 
             fontSize: '0.7rem', 
-            color: '#00ff88',
+            color: '#8fbc6b',
             marginTop: '0.25rem'
           }}>
             ● {connectionStatus}
@@ -286,7 +286,7 @@ export default function ControlPanel() {
               </div>
 
               {isRunning && (
-                <p className="settings-note">⚠️ Stop simulation to change settings</p>
+                <p className="settings-note">Stop simulation to change settings</p>
               )}
             </motion.div>
           )}
